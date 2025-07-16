@@ -1,10 +1,10 @@
 // NetworkModule.mjs
-// network module for the Attitude Control 2.A app
-// copyright 2024 Drew Shipps, J Squared Systems
+// network module for the Flair Node firmware
+// copyright 2025 Drew Shipps, J Squared Systems
 
 
 // this module creates a single instance of the NetworkModule javascript object,
-// which processes all requests to the Attitude Lighting server
+// which processes all requests to the Flair Node server
 
 
 
@@ -22,7 +22,7 @@ import idManager from './IdManager.mjs';
 
 
 // variables
-const API_URL = 'https://attitude.lighting/api/v1/device/sync';  // URL to hit with a POST request
+const API_URL = 'https://flairled.com/api/v1/flair-node/sync';  // URL to hit with a POST request
 
 const USE_LOCALHOST = false;  // set to true to use the attitudelighting.test API_URL instead (FOR DEVELOPMENT ONLY)
 const LAPTOP_MODE = (process.platform == 'darwin');  // checks whether we're running on macos (laptop mode) or not
@@ -53,7 +53,7 @@ class NetworkModule {
         // this is added to make absolutely sure that we only use the attitudelighting.test API URL if we're running on
         // macOS laptop for development, and to ensure that production devices can NEVER use this url
         if (USE_LOCALHOST && LAPTOP_MODE) {
-        	this.url = 'http://attitudelighting.test/api/v1/device/sync';
+        	this.url = 'http://flairled.test/api/v1/flair-node/sync';
         }
 
         // Initialize queue of objects that are pending to be sent to the server
@@ -132,9 +132,9 @@ class NetworkModule {
         	data: {
 				timestamp: new Date().toISOString(),
 				sequenceNumber: 2,
-				module: 'AttitudeControl2A',
+				module: 'FlairNode',
 				type: 'info',
-				message: 'Attitude Control Device Firmware (2nd gen) v2.A',
+				message: 'Flair Node Device Firmware v1.0',
 		    },
         });
 
@@ -144,9 +144,9 @@ class NetworkModule {
         	data: {
 				timestamp: new Date().toISOString(),
 				sequenceNumber: 3,
-				module: 'AttitudeControl2A',
+				module: 'FlairNode',
 				type: 'info',
-				message: 'Copyright 2024 Drew Shipps, J Squared Systems',
+				message: 'Copyright 2025 Drew Shipps, J Squared Systems',
 		    },
         });
 
@@ -156,7 +156,7 @@ class NetworkModule {
         	data: {
 				timestamp: new Date().toISOString(),
 				sequenceNumber: 4,
-				module: 'AttitudeControl2A',
+				module: 'FlairNode',
 				type: 'info',
 				message: 'System initializing on ' + new Date(),
 		    },
@@ -219,8 +219,8 @@ class NetworkModule {
 
     	// create an object for the actual request
     	const requestObject = {
-    		device_id: idManager.getId(),
-    		serialnumber: idManager.getSerialNumber(),
+    		node_id: idManager.getId(),
+    		serial_number: idManager.getSerialNumber(),
     		payload: payload,
     	};
 
@@ -232,6 +232,7 @@ class NetworkModule {
 		    method: 'POST',
 		    headers: {
 		        'Content-Type': 'application/json', // Set the Content-Type header to indicate JSON data
+				'Accept': 'application/json', // only accept JSON data in return
 		    },
 		    body: JSON.stringify(requestObject), // Convert the request object to a JSON string and set as the request body
 		})
@@ -244,7 +245,7 @@ class NetworkModule {
 			// check response status (response.ok will return true if the HTTP code is anything 200-299)
 		    if (!response.ok) {
 		    	// if not ok, throw an error
-		        throw new Error(`Request failed with status ${response.status}`);
+		        // throw new Error(`Request failed with status ${response.status}`);
 		    }
 
 			// log a success message
@@ -284,6 +285,9 @@ class NetworkModule {
 
 		// then handle the data from the response
 		.then(data => {
+			// console log raw response data
+			console.log(data);
+
     		// handle the response data
     		this.handleResponse(data);
 
