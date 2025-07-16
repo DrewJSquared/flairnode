@@ -8,139 +8,138 @@
 			padding: 0;
 			width: 1920px;
 			height: 1080px;
+			background: black;
 			overflow: hidden;
-			background-color: black;
 			font-family: sans-serif;
 		}
 
-		#splash {
+		#bootScreen, #errorScreen {
 			position: absolute;
-			top: 0;
-			left: 0;
-			width: 1920px;
-			height: 1080px;
-			display: none;
+			top: 0; left: 0;
+			width: 100%; height: 100%;
+			display: flex;
 			justify-content: center;
 			align-items: center;
 			background-color: black;
+			z-index: 1000;
 		}
 
-		#splash img {
-			width: 1920px;
-			height: 1080px;
+		#bootScreen img, #errorScreen img {
+			width: 100%;
+			height: 100%;
 			object-fit: contain;
-		}
-
-		#video {
-			position: absolute;
-			top: 0;
-			left: 0;
-			display: none;
-		}
-
-		#error {
-			position: absolute;
-			top: 10px;
-			left: 10px;
-			color: white;
-			font-size: 12pt;
-			display: none;
 		}
 	</style>
 </head>
 <body>
-	<!-- Splash screen -->
-	<div id="splash">
-		<img src="file:///home/flair/Flair_Boot_128x128.png" alt="Splash Image">
+	<!-- Boot splash -->
+	<div id="bootScreen">
+
+		<!-- <img src="file:///Users/drewshipps/NodeJS/flairnode/Flair_Boot_128x128.png" alt="Flair Boot"> -->
+		<img src="./Flair_Boot_128x128.png" alt="Flair Boot">
 	</div>
 
-	<!-- Video -->
-	<video id="video" autoplay muted playsinline loop>
-		<source id="videoSource" type="video/mp4">
-		Your browser does not support the video tag.
-	</video>
-
-	<!-- Error message if video not found -->
-	<div id="error"></div>
+	<!-- Error fallback -->
+	<div id="errorScreen" style="display: none;">
+		<img src="./Flair_Error_128x128.png" alt="Error">
+	</div>
 
 	<script>
-		const splash = document.getElementById('splash');
-		const video = document.getElementById('video');
-		const videoSource = document.getElementById('videoSource');
-		const error = document.getElementById('error');
+		const WS_PORT = 9223;
+		const KEEPALIVE_TIMEOUT_MS = 10000; // time without message before error
+		let ws;
+		let lastMessageTime = Date.now();
 
-		const usbPaths = [
-			'/media/usb0',            // Your flair-usb-automount mount point
-			'/media/flair',
-			'/run/media/flair',
-			'/media',
-		];
+		// DOM elements
+		const bootScreen = document.getElementById('bootScreen');
+		const errorScreen = document.getElementById('errorScreen');
 
-		const fileName = 'video.mp4';
-		let retrySeconds = 5;
-
-		function showRetryCountdown() {
-			error.style.display = 'block';
-			error.textContent = `Video file not found, retrying in ${retrySeconds}...`;
-
-			const countdown = setInterval(() => {
-				retrySeconds--;
-				if (retrySeconds <= 0) {
-					clearInterval(countdown);
-					error.style.display = 'none';
-					retrySeconds = 5;
-					tryLoadVideo();
-				} else {
-					error.textContent = `Video file not found, retrying in ${retrySeconds}...`;
-				}
-			}, 1000);
-		}
-
-		function tryLoadVideo() {
-			const path = '/media/usb0/video.mp4';
-			const fullPath = `file://${path}`;
-
-			videoSource.src = fullPath;
-			video.load();
-
-			let failed = false;
-
-			video.onerror = () => {
-				if (!failed) {
-					failed = true;
-					error.style.display = 'block';
-					error.textContent = `Could not load: ${fullPath} (retrying in ${retrySeconds}...)`;
-					showRetryCountdown();
-				}
-			};
-
-			video.onloadedmetadata = () => {
-				error.style.display = 'none';
-				video.style.width = video.videoWidth + 'px';
-				video.style.height = video.videoHeight + 'px';
-				video.style.display = 'block';
-				video.play();
-			};
-		}
-
-
-
-		// Show red, green, blue, black sequence
+		// RGB test pattern
 		setTimeout(() => document.body.style.backgroundColor = 'red', 0);
 		setTimeout(() => document.body.style.backgroundColor = 'green', 1000);
 		setTimeout(() => document.body.style.backgroundColor = 'blue', 2000);
 		setTimeout(() => document.body.style.backgroundColor = 'black', 3000);
 
-		// Show splash
-		setTimeout(() => {
-			splash.style.display = 'flex';
-		}, 4000);
+		// === WebSocket Setup ===
+		function connectWebSocket() {
+			ws = new WebSocket(`ws://localhost:${WS_PORT}`);
 
-		// Try to load video after splash
-		setTimeout(() => {
-			splash.style.display = 'none';
-			tryLoadVideo();
-		}, 19000);
+			ws.onopen = () => {
+				console.log('WebSocket connected to backend.');
+				hideErrorScreen();
+			};
+
+			ws.onmessage = (event) => {
+				lastMessageTime = Date.now();
+
+				try {
+					const msg = JSON.parse(event.data);
+					handleCommand(msg.command, msg.data);
+				} catch (e) {
+					console.error('Invalid message:', event.data);
+				}
+			};
+
+			ws.onclose = () => {
+				console.warn('WebSocket closed.');
+				showErrorScreen();
+			};
+
+			ws.onerror = (err) => {
+				console.error('WebSocket error:', err);
+				showErrorScreen();
+			};
+		}
+
+		function handleCommand(command, data) {
+			// On first valid command, hide boot screen
+			bootScreen.style.display = 'none';
+
+			switch (command) {
+				case 'play_video':
+					// TODO: Implement play logic
+					break;
+
+				case 'stop_video':
+					// TODO: Implement stop logic
+					break;
+
+				case 'draw_layout':
+					// TODO: Implement layout drawing
+					break;
+
+				case 'set_message':
+					// TODO: Implement message overlay
+					break;
+
+				case 'fade_black':
+					// TODO: Implement screen fade to black
+					break;
+
+				default:
+					console.warn(`Unknown command: ${command}`);
+			}
+		}
+
+		// === Fallback/Error Handling ===
+		function showErrorScreen() {
+			errorScreen.style.display = 'flex';
+		}
+
+		function hideErrorScreen() {
+			errorScreen.style.display = 'none';
+		}
+
+		// === Keepalive Monitor ===
+		setInterval(() => {
+			if (Date.now() - lastMessageTime > KEEPALIVE_TIMEOUT_MS) {
+				console.warn('No keepalive from backend. Showing error.');
+				showErrorScreen();
+			}
+		}, 2000);
+
+		// Start connection
+		connectWebSocket();
 	</script>
 </body>
 </html>
