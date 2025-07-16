@@ -1,3 +1,8 @@
 {
-  "message": "Server Error"
+  "message": "Server Error",
+  "node_id": 1,
+  "serial_number": "FN-0000001",
+  "logLevel": "none",
+  "reboot": false,
+  "update": false
 }

@@ -24,7 +24,7 @@ import idManager from './IdManager.mjs';
 // variables
 const API_URL = 'https://flairled.com/api/v1/flair-node/sync';  // URL to hit with a POST request
 
-const USE_LOCALHOST = false;  // set to true to use the attitudelighting.test API_URL instead (FOR DEVELOPMENT ONLY)
+const USE_LOCALHOST = true;  // set to true to use the attitudelighting.test API_URL instead (FOR DEVELOPMENT ONLY)
 const LAPTOP_MODE = (process.platform == 'darwin');  // checks whether we're running on macos (laptop mode) or not
 
 const PING_INTERVAL = 1000;  // interval in ms to ping the server (should be 1000ms)
@@ -231,8 +231,8 @@ class NetworkModule {
 		fetch(this.url, {
 		    method: 'POST',
 		    headers: {
-		        'Content-Type': 'application/json', // Set the Content-Type header to indicate JSON data
 				'Accept': 'application/json', // only accept JSON data in return
+		        'Content-Type': 'application/json', // Set the Content-Type header to indicate JSON data
 		    },
 		    body: JSON.stringify(requestObject), // Convert the request object to a JSON string and set as the request body
 		})
@@ -245,7 +245,7 @@ class NetworkModule {
 			// check response status (response.ok will return true if the HTTP code is anything 200-299)
 		    if (!response.ok) {
 		    	// if not ok, throw an error
-		        // throw new Error(`Request failed with status ${response.status}`);
+		        throw new Error(`Request failed with status ${response.status}`);
 		    }
 
 			// log a success message
@@ -410,18 +410,6 @@ class NetworkModule {
     // macrosStatusListener for macrosStatus events
     macrosStatusListener(currentMacrosStatus) {
     	this.enqueueData('macrosStatus', currentMacrosStatus);
-    }
-
-
-    // senseDataListener for senseData events
-    senseDataListener(currentSenseData) {
-    	this.enqueueData('senseData', currentSenseData);
-    }
-
-
-    // attitudeEmitDataListener for attitudeEmitDataReceived events
-    attitudeEmitDataListener(currentEmitData) {
-    	this.enqueueData('attitudeEmitDataReceived', currentEmitData);
     }
 
 
