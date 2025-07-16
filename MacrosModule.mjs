@@ -1,10 +1,10 @@
 // MacrosModule.mjs
-// macro control module for the Attitude Control 2.A app
-// copyright 2024 Drew Shipps, J Squared Systems
+// macro control module for the Flair Node firmware
+// copyright 2025 Drew Shipps, J Squared Systems
 
 
 // this module creates a single instance of the MacrosModule javascript object,
-// which handles the reboot, restart, update, and autoupdate controls for the device
+// which handles the reboot and update controls for the device
 
 
 
@@ -37,15 +37,12 @@ class MacrosModule {
 
         // variables
         this.rebootQueuedFromServer = false;
-        this.restartQueuedFromServer = false;
         this.updateQueuedFromServer = false;
 
         this.rebootCommandSuccess = false;
-        this.restartCommandSuccess = false;
         this.updateCommandSuccess = false;
 
         this.rebootCommandResults = '';
-        this.restartCommandResults = '';
         this.updateCommandResults = '';
 
         // emit an event that the macros module is operational
@@ -85,9 +82,9 @@ class MacrosModule {
         });
 
 
-        // run the three different macro functions as promises
+        // run the two different macro functions as promises
         Promise.race([
-            Promise.all([this.handleReboot(), this.handleRestart(), this.handleUpdate()]), // race these three promises 
+            Promise.all([this.handleReboot(), this.handleUpdate()]), // race these two promises 
             timeoutPromise // with the timeout promise
         ])
         .then((results) => {
@@ -126,7 +123,6 @@ class MacrosModule {
     // get updated config from configManager
     getUpdatedConfig() {
         this.rebootQueuedFromServer = configManager.getReboot();
-        this.restartQueuedFromServer = configManager.getRestart();
         this.updateQueuedFromServer = configManager.getUpdate();
     }
 
@@ -209,82 +205,6 @@ class MacrosModule {
 
                 // resolve with a n/a message
                 resolve('No reboot queued from server.');
-            }
-        });
-    }
-
-
-    // handle restart command
-    handleRestart() {
-        // return a promise
-        return new Promise((resolve, reject) => {
-            // check if a restart command has been queued from the server
-            if (this.restartQueuedFromServer == true) {
-
-                // get the file path for the config.json file
-                let configFilePath = configManager.getConfigFilePath();
-
-                // try to remove it and restart pm2
-                try {
-                    // syncronously remove the 
-                    fs.unlinkSync(configFilePath);
-
-                    // restart pm2 asyncronosly after 30 seconds.
-                    // this is intended to give the network module a second to let the server know
-                    // that the delete config part worked
-                    this.restartPm2Async();
-
-                    // set this.restartCommandSuccess to true to indicate that the command was successful
-                    this.restartCommandSuccess = true;
-
-                    // set the restartCommandResults variable to a success string
-                    this.restartCommandResults = 'config.json successfully deleted and pm2 restart queued for 30 seconds from now!';
-
-                    // log the success
-                    logger.info(`config.json successfully deleted and pm2 restart queued for 30 seconds from now!`);
-
-                    // emit a success event
-                    eventHub.emit('moduleStatus', { 
-                        name: 'MacrosModule', 
-                        status: 'operational',
-                        data: `config.json successfully deleted and pm2 restart queued for 30 seconds from now!`,
-                    });
-
-                    // resolve with the success text
-                    resolve(this.restartCommandResults);
-                } catch (error) {
-                    // else catch any errors with deleting the file or restarting pm2
-
-                    // set the restartCommandSuccess variable to false, since the restart failed
-                    this.restartCommandSuccess = false;
-
-                    // set the restartCommandResults variable to the error text
-                    if (error.code === 'ENOENT') {
-                        this.restartCommandResults = `File not found: ${configFilePath}`;
-                    } else {
-                        this.restartCommandResults = `An error occurred while deleting ${configFilePath}: ${error}`;
-                    }
-
-                    // log the error
-                    logger.error(this.restartCommandResults);
-
-                    // emit an event that we had an error
-                    eventHub.emit('moduleStatus', { 
-                        name: 'MacrosModule', 
-                        status: 'errored',
-                        data: this.restartCommandResults,
-                    });
-
-                    // resolve with the error text
-                    resolve(this.restartCommandResults);
-                }
-            } else {
-                // otherwise, we don't need to restart, so ensure that restartCommandResults is reset
-                this.restartCommandSuccess = false;
-                this.restartCommandResults = '';
-
-                // resolve with a n/a message
-                resolve('No restart queued from server.');
             }
         });
     }
@@ -409,10 +329,6 @@ class MacrosModule {
                 rebootQueuedFromServer: this.rebootQueuedFromServer,
                 rebootCommandSuccess: this.rebootCommandSuccess,
                 rebootCommandResults: this.rebootCommandResults,
-
-                restartQueuedFromServer: this.restartQueuedFromServer,
-                restartCommandSuccess: this.restartCommandSuccess,
-                restartCommandResults: this.restartCommandResults,
 
                 updateQueuedFromServer: this.updateQueuedFromServer,
                 updateCommandSuccess: this.updateCommandSuccess,
