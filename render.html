@@ -142,7 +142,7 @@ System initializing...
 		}
 
 		// connect web socket after 14 sec (4 sec RGB test 10 sec boot screen)
-		setTimeout(connectWebSocket, 4000); // TODO FIX THIS
+		setTimeout(connectWebSocket, 1000); // TODO FIX THIS
 
 
 		// === Global crash guard ===
@@ -208,30 +208,57 @@ System initializing...
 			const yesDiv = document.getElementById('identifyThisNodeScreen');
 			const noDiv = document.getElementById('identifyNotThisNodeScreen');
 
-			const text = isThisNode
-				? `It's me! (SN: ${serialNumber})`
-				: `Sorry, not me. (SN: ${serialNumber})`;
-
-			const repeatedText = Array(100).fill(text).join(' • '); // repeat ~100x
-
 			const targetDiv = isThisNode ? yesDiv : noDiv;
 			const otherDiv = isThisNode ? noDiv : yesDiv;
 
 			// hide the other
 			otherDiv.style.display = 'none';
 
-			// set background
-			targetDiv.style.display = 'flex';
-			targetDiv.style.justifyContent = 'center';
-			targetDiv.style.alignItems = 'center';
+			// set up targetDiv as a grid
+			targetDiv.style.display = 'grid';
+			targetDiv.style.gridTemplateColumns = 'repeat(auto-fill, minmax(180px, 1fr))';
+			targetDiv.style.gridAutoRows = '60px'; // fixed row height
+			targetDiv.style.gap = '0px';
+			targetDiv.style.padding = '5px';
 			targetDiv.style.color = 'white';
-			targetDiv.style.fontSize = '12px';
+			targetDiv.style.fontSize = '16px';
 			targetDiv.style.fontFamily = 'monospace';
-			targetDiv.style.textAlign = 'left';
+			targetDiv.style.overflow = 'hidden';
+			targetDiv.style.height = '100vh'; // full screen height
 
-			// set repeated text
-			targetDiv.innerHTML = `<div style="white-space: pre-wrap; word-break: break-word; width: 90%;">${repeatedText}</div>`;
+			// define text for each block
+			const text = isThisNode
+				? `Hi, it's me!<br>(SN: ${serialNumber})`
+				: `Sorry, not me.<br>(SN: ${serialNumber})`;
+
+			// generate grid cells
+			const totalBlocks = 170;
+			let gridHtml = '';
+
+			for (let i = 0; i < totalBlocks; i++) {
+				gridHtml += `
+					<div style="
+						background: none;
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						justify-content: center;
+						text-align: center;
+						width: 180px;
+						height: 60px;
+					">
+						${text}
+					</div>
+				`;
+			}
+
+			// inject grid into target
+			targetDiv.innerHTML = gridHtml;
 		}
+
+
+		
+
 
 
 
