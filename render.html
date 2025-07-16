@@ -42,13 +42,27 @@
 		<img src="./Flair_Error_128x128.png" alt="Error">
 	</div>
 
-	<script>
-		console.log('Welcome to the Flair REnder');
+	<!-- Identify this node -->
+	<div id="identifyThisNodeScreen" style="display: none; background-color: green; width: 100%; height: 100%; position: absolute; overflow: hidden;"></div>
 
+	<!-- Identify not this node -->
+	<div id="identifyNotThisNodeScreen" style="display: none; background-color: red; width: 100%; height: 100%; position: absolute; overflow: hidden;"></div>
+
+
+
+	<script>
+		console.log(`---------------------------
+Flair Node HTML Render Page
+Copyright 2025 Drew Shipps, J Squared Systems
+System initializing...
+---------------------------`);
+
+
+		// === VARIABLES ===
 		const WS_PORT = 9223;
-		const KEEPALIVE_TIMEOUT_MS = 15000; // time without message before error (15s)
-		let ws;
-		let lastMessageTime = Date.now();
+		let ws = null;
+		let reconnectInterval = 1000;
+		let isConnected = false;
 
 
 		// DOM elements
@@ -83,42 +97,52 @@
 		// === WebSocket Setup ===
 		function connectWebSocket() {
 			try {
-				ws = new WebSocket(`ws://localhost:${WS_PORT}`);
+				ws = new WebSocket(`ws://localhost:9223`);
 
 				ws.onopen = () => {
-					console.log('WebSocket connected to backend.');
-					hideErrorScreen();
+					console.log('WebSocket connected!');
+					isConnected = true;
+					hideErrorScreen(); // if you have one
+					hideBootScreen();
 				};
 
 				ws.onmessage = (event) => {
-					lastMessageTime = Date.now();
-
 					try {
 						const msg = JSON.parse(event.data);
-						handleCommand(msg.command, msg.data);
-					} catch (e) {
-						console.error('Invalid message:', event.data);
+						handleWebSocketMessage(msg); // your command handler
+					} catch (err) {
+						console.error('WS message error:', err);
+						showErrorScreen();
 					}
-				};
-
-				ws.onclose = () => {
-					console.warn('WebSocket closed.');
-					showErrorScreen();
 				};
 
 				ws.onerror = (err) => {
 					console.error('WebSocket error:', err);
-					showErrorScreen();
 				};
+
+				ws.onclose = () => {
+					console.warn('WebSocket disconnected');
+					isConnected = false;
+					showErrorScreen();
+
+					// attempt reconnect after delay
+					setTimeout(() => {
+						connectWebSocket();
+					}, reconnectInterval);
+				};
+
 			} catch (err) {
-				console.error('WebSocket init error:', err);
-				showErrorScreen();
-				return;
+				console.error('WebSocket connection error:', err);
+
+				// retry after delay if constructor failed
+				setTimeout(() => {
+					connectWebSocket();
+				}, reconnectInterval);
 			}
 		}
 
 		// connect web socket after 14 sec (4 sec RGB test 10 sec boot screen)
-		setTimeout(connectWebSocket, 14000);
+		setTimeout(connectWebSocket, 4000); // TODO FIX THIS
 
 
 		// === Global crash guard ===
@@ -133,36 +157,85 @@
 		});
 
 
+		// handle the raw websocket message and attempt to parse into commands
+		function handleWebSocketMessage(msg) {
+			try {
+				// validate message format
+				if (!msg || typeof msg !== 'object') {
+					console.warn('Invalid WebSocket message format');
+					return;
+				}
+
+				const { command, data } = msg;
+
+				if (!command) {
+					console.warn('WebSocket message missing "command" field');
+					return;
+				}
+
+				handleCommand(command, data);
+			} catch (err) {
+				console.error('Failed to process WebSocket message:', err);
+				showErrorScreen();
+			}
+		}
+
+
+
 		// handle websocket commands
 		function handleCommand(command, data) {
 			// On first valid command, hide boot screen
 			bootScreen.style.display = 'none';
 
 			switch (command) {
-				case 'play_video':
-					// TODO: Implement play logic
+				case 'identify_this_node':
+					showIdentifyScreen(true, data?.serial_number);
 					break;
 
-				case 'stop_video':
-					// TODO: Implement stop logic
-					break;
-
-				case 'draw_layout':
-					// TODO: Implement layout drawing
-					break;
-
-				case 'set_message':
-					// TODO: Implement message overlay
-					break;
-
-				case 'fade_black':
-					// TODO: Implement screen fade to black
+				case 'identify_not_this_node':
+					showIdentifyScreen(false, data?.serial_number);
 					break;
 
 				default:
 					console.warn(`Unknown command: ${command}`);
 			}
 		}
+
+
+		// MAIN APP FUNCTIONS HERE
+
+		function showIdentifyScreen(isThisNode, serialNumber = 'UNKNOWN') {
+			const yesDiv = document.getElementById('identifyThisNodeScreen');
+			const noDiv = document.getElementById('identifyNotThisNodeScreen');
+
+			const text = isThisNode
+				? `It's me! (SN: ${serialNumber})`
+				: `Sorry, not me. (SN: ${serialNumber})`;
+
+			const repeatedText = Array(100).fill(text).join(' • '); // repeat ~100x
+
+			const targetDiv = isThisNode ? yesDiv : noDiv;
+			const otherDiv = isThisNode ? noDiv : yesDiv;
+
+			// hide the other
+			otherDiv.style.display = 'none';
+
+			// set background
+			targetDiv.style.display = 'flex';
+			targetDiv.style.justifyContent = 'center';
+			targetDiv.style.alignItems = 'center';
+			targetDiv.style.color = 'white';
+			targetDiv.style.fontSize = '12px';
+			targetDiv.style.fontFamily = 'monospace';
+			targetDiv.style.textAlign = 'left';
+
+			// set repeated text
+			targetDiv.innerHTML = `<div style="white-space: pre-wrap; word-break: break-word; width: 90%;">${repeatedText}</div>`;
+		}
+
+
+
+
 
 		// === Fallback/Error Handling ===
 		function showBootScreen() {
@@ -181,14 +254,6 @@
 		function hideErrorScreen() {
 			errorScreen.style.display = 'none';
 		}
-
-		// === Keepalive Monitor ===
-		setInterval(() => {
-			if (Date.now() - lastMessageTime > KEEPALIVE_TIMEOUT_MS) {
-				console.warn('No keepalive from backend. Showing error.');
-				showErrorScreen();
-			}
-		}, 2000);
 	</script>
 </body>
 </html>

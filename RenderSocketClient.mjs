@@ -9,11 +9,13 @@
 
 
 // import modules
-import { WebSocketServer } from 'ws';
 import eventHub from './EventHub.mjs';
+import idManager from './IdManager.mjs';
 
 import Logger from './Logger.mjs';
 const logger = new Logger('RenderSocketClient');
+
+import { WebSocketServer } from 'ws';
 
 
 
@@ -56,7 +58,7 @@ class RenderSocketClient {
 
 			// accept client
 			this.clientSocket = ws;
-			logger.info(`Render client connected from ${clientAddress}`);
+			logger.info(`Render client connected!! (clientAddress: ${clientAddress})`);
 
 			// emit event
 			eventHub.emit('renderClientConnected');
@@ -85,6 +87,9 @@ class RenderSocketClient {
 		this.wss.on('error', (err) => {
 			logger.error(`WebSocket server error: ${err.message}`);
 		});
+
+
+		this.startIdentifyFlipFlopTest();
 	}
 
 
@@ -118,6 +123,32 @@ class RenderSocketClient {
 	isConnected() {
 		return !!this.clientSocket && this.clientSocket.readyState === this.clientSocket.OPEN;
 	}
+
+
+
+
+
+
+	// test identify screen trigger - TEMP
+	// toggle identify screens every 5 seconds (for testing)
+	startIdentifyFlipFlopTest() {
+		let showThisNode = true;
+
+		setInterval(() => {
+			const serial = idManager.getSerialNumber();
+			console.log(`sending for sn ${serial}`);
+			
+			if (showThisNode) {
+				this.send('identify_this_node', { serial_number: serial });
+			} else {
+				this.send('identify_not_this_node', { serial_number: serial });
+			}
+
+			showThisNode = !showThisNode;
+		}, 5000);
+	}
+
+
 }
 
 

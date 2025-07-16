@@ -19,6 +19,8 @@ import moduleStatusTracker from './ModuleStatusTracker.mjs';
 import macrosModule from './MacrosModule.mjs';
 import udpManager from './UDPManager.mjs';
 
+import renderSocketClient from './RenderSocketClient.mjs';
+
 
 
 // ==================== INITIALIZATION SEQUENCE ====================
@@ -29,27 +31,29 @@ logger.info('Copyright 2025 Drew Shipps, J Squared Systems');
 logger.info('System initializing at time ' + new Date());
 
 
-// init screen connnect first? display "connected to JS backend" or sum?
-
+// init render socket client
+setTimeout(() => {
+	renderSocketClient.init();
+}, 10);
 
 // initialize config manager and id manager
 setTimeout(() => {
 	idManager.init();
 	configManager.init();
-}, 10);
+}, 20);
 
 
 // initialize network module so it can begin listening for messages
 setTimeout(() => {
 	networkModule.init();
-}, 20);
+}, 30);
 
 
 // initialize status trackers
 setTimeout(() => {
 	statusTracker.init();
 	moduleStatusTracker.init();
-}, 30);
+}, 40);
 
 
 // initialize macros module
