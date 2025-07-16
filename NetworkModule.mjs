@@ -110,8 +110,6 @@ class NetworkModule {
         eventHub.on('systemStatusUpdate', this.systemStatusUpdateListener.bind(this));
         eventHub.on('moduleStatusUpdate', this.moduleStatusUpdateListener.bind(this));
         eventHub.on('macrosStatus', this.macrosStatusListener.bind(this));
-        eventHub.on('senseData', this.senseDataListener.bind(this));
-        eventHub.on('attitudeEmitDataReceived', this.attitudeEmitDataListener.bind(this));
 
         // add some initial log message to the queue to show that we are initializing the system
         this.queue.push({
