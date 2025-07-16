@@ -1,6 +1,6 @@
 // EventHub.mjs
-// event hub module for the Attitude Control 2.A app
-// copyright 2024 Drew Shipps, J Squared Systems
+// event hub module for the Flair Node firmware
+// copyright 2025 Drew Shipps, J Squared Systems
 
 
 // this module creates a single instance of the EventEmitter javascript object,

@@ -1,6 +1,6 @@
 // Logger.mjs
-// a logger module for the Attitude Control 2.A app
-// copyright 2024 Drew Shipps, J Squared Systems
+// a logger module for the Flair Node firmware
+// copyright 2025 Drew Shipps, J Squared Systems
 
 
 // import modules

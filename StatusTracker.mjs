@@ -1,6 +1,6 @@
 // StatusTracker.mjs
-// status tracking module for the Attitude Control 2.A app
-// copyright 2024 Drew Shipps, J Squared Systems
+// status tracking module for the Flair Node firmware
+// copyright 2025 Drew Shipps, J Squared Systems
 
 
 // this module creates a single instance of the StatusTracker javascript object,

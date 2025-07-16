@@ -1,11 +1,11 @@
 // UDPManager.mjs
-// Centralized UDP communication manager for the Attitude Control 2.A app
+// Centralized UDP communication manager for the Flair Node firmware
 // Handles outbound message sending and inbound message receiving
 // copyright 2025 Drew Shipps, J Squared Systems
 
 
 // this module creates a single instance of the UDPManager javascript object,
-// which handles UDP communication for all device types in the Attitude system
+// which handles UDP communication for all device types in the Flair Node system
 
 
 
@@ -125,7 +125,7 @@ class UDPManager {
 			// build message with standard fields
 			const message = {
 				...payloadObject,
-				NAME: 'Attitude Control',
+				NAME: 'Flair Node',
 				TYPE: 0,
 				PACKET_NO: this.packetCounter,
 			};
