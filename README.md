@@ -1,9 +1,9 @@
-# attitudecontrol2a
+# FlairNode
  
-Attitude Control (2nd gen) device firmware, version 2.A
+Flair Node device firmware, version 1.0
 
 
-## How to Install From Scratch
+## How to Install From Scratch (old to update)
 Download the GitHub repository as a zip file
 `curl -L -o attitudecontrol2a.zip "https://github.com/DrewJSquared/attitudecontrol2a/archive/refs/heads/main.zip"`
 
