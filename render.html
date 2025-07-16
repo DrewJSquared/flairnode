@@ -33,9 +33,7 @@
 </head>
 <body>
 	<!-- Boot splash -->
-	<div id="bootScreen">
-
-		<!-- <img src="file:///Users/drewshipps/NodeJS/flairnode/Flair_Boot_128x128.png" alt="Flair Boot"> -->
+	<div id="bootScreen" style="display: none;">
 		<img src="./Flair_Boot_128x128.png" alt="Flair Boot">
 	</div>
 
@@ -45,52 +43,97 @@
 	</div>
 
 	<script>
+		console.log('Welcome to the Flair REnder');
+
 		const WS_PORT = 9223;
-		const KEEPALIVE_TIMEOUT_MS = 10000; // time without message before error
+		const KEEPALIVE_TIMEOUT_MS = 15000; // time without message before error (15s)
 		let ws;
 		let lastMessageTime = Date.now();
+
 
 		// DOM elements
 		const bootScreen = document.getElementById('bootScreen');
 		const errorScreen = document.getElementById('errorScreen');
 
-		// RGB test pattern
-		setTimeout(() => document.body.style.backgroundColor = 'red', 0);
-		setTimeout(() => document.body.style.backgroundColor = 'green', 1000);
-		setTimeout(() => document.body.style.backgroundColor = 'blue', 2000);
-		setTimeout(() => document.body.style.backgroundColor = 'black', 3000);
+
+		// === Boot sequence (1 s per color, fully crash-safe) ===
+		function startBootSequence() {
+			const colors = ['red', 'green', 'blue', 'black'];
+
+			colors.forEach((color, idx) => {
+				setTimeout(() => {
+					try {
+						document.body.style.backgroundColor = color;
+						console.log('Flair boot color test ' + color);
+					} catch (err) {
+						console.error('Boot sequence error:', err);
+						showErrorScreen();
+					}
+				}, idx * 1000); // 1000 ms per color
+			});
+		}
+
+		// start boot pattern immediately
+		startBootSequence();
+
+		// show boot screen after 4 sec
+		setTimeout(showBootScreen, 4000);
+
 
 		// === WebSocket Setup ===
 		function connectWebSocket() {
-			ws = new WebSocket(`ws://localhost:${WS_PORT}`);
+			try {
+				ws = new WebSocket(`ws://localhost:${WS_PORT}`);
 
-			ws.onopen = () => {
-				console.log('WebSocket connected to backend.');
-				hideErrorScreen();
-			};
+				ws.onopen = () => {
+					console.log('WebSocket connected to backend.');
+					hideErrorScreen();
+				};
 
-			ws.onmessage = (event) => {
-				lastMessageTime = Date.now();
+				ws.onmessage = (event) => {
+					lastMessageTime = Date.now();
 
-				try {
-					const msg = JSON.parse(event.data);
-					handleCommand(msg.command, msg.data);
-				} catch (e) {
-					console.error('Invalid message:', event.data);
-				}
-			};
+					try {
+						const msg = JSON.parse(event.data);
+						handleCommand(msg.command, msg.data);
+					} catch (e) {
+						console.error('Invalid message:', event.data);
+					}
+				};
 
-			ws.onclose = () => {
-				console.warn('WebSocket closed.');
+				ws.onclose = () => {
+					console.warn('WebSocket closed.');
+					showErrorScreen();
+				};
+
+				ws.onerror = (err) => {
+					console.error('WebSocket error:', err);
+					showErrorScreen();
+				};
+			} catch (err) {
+				console.error('WebSocket init error:', err);
 				showErrorScreen();
-			};
-
-			ws.onerror = (err) => {
-				console.error('WebSocket error:', err);
-				showErrorScreen();
-			};
+				return;
+			}
 		}
 
+		// connect web socket after 14 sec (4 sec RGB test 10 sec boot screen)
+		setTimeout(connectWebSocket, 14000);
+
+
+		// === Global crash guard ===
+		window.addEventListener('error', (e) => {
+			console.error('Unhandled error:', e.error || e.message);
+			showErrorScreen();
+		});
+
+		window.addEventListener('unhandledrejection', (e) => {
+			console.error('Unhandled promise rejection:', e.reason);
+			showErrorScreen();
+		});
+
+
+		// handle websocket commands
 		function handleCommand(command, data) {
 			// On first valid command, hide boot screen
 			bootScreen.style.display = 'none';
@@ -122,6 +165,15 @@
 		}
 
 		// === Fallback/Error Handling ===
+		function showBootScreen() {
+			console.log('Showing Flair boot screen...');
+			bootScreen.style.display = 'flex';
+		}
+
+		function hideBootScreen() {
+			bootScreen.style.display = 'none';
+		}
+
 		function showErrorScreen() {
 			errorScreen.style.display = 'flex';
 		}
@@ -137,9 +189,6 @@
 				showErrorScreen();
 			}
 		}, 2000);
-
-		// Start connection
-		connectWebSocket();
 	</script>
 </body>
 </html>
