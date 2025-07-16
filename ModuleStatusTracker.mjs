@@ -1,6 +1,5 @@
 // ModuleStatusTracker.mjs
-// this single-instance module tracks statuses of other modules for the Attitude Control 2.A app
-// it also handles updating the color of the LED board
+// this single-instance module tracks statuses of other modules for the Flair Node firmware
 // copyright 2024 Drew Shipps, J Squared Systems
 
 
@@ -126,59 +125,12 @@ class ModuleStatusTracker {
 
     // processModuleStatuses - check on the status of important modules. set led panel, white backup, and overall status accordingly
     processModuleStatuses() {
-        // if SACN is errored, then go full red on the LED panel
-        if (this.getModuleStatusByName('AttitudeSACN') == 'errored') {
-            // E is just solid red no flash
-            attitudeLED.setColor('E');
-
-            // set the overall condition of the device to send to network
-            this.overallStatus = 'errored';
-
-            return;
-        }
-
-
-        // check if these modules have errored. if so, we need to go to white backup mode
-        if (this.getModuleStatusByName('AttitudeScheduler') == 'errored'
-            || this.getModuleStatusByName('AttitudeFixtureManager') == 'errored') {
-
-            // set LED to cyan for white backup mode
-            attitudeLED.setColor('C');
-
-            // activate white backup mode
-            attitudeSACN.setWhiteBackupMode(true);
-
-            // set the overall condition of the device to send to network
-            this.overallStatus = 'white';
-
-            return;
-        } else {
-            // unless these modules have errored, then we should ensure white backup mode is disabled
-            attitudeSACN.setWhiteBackupMode(false);
-        }
-
-
-        // if these modules are degraded or offline, there's an issue, but not a full on crash
-        if (this.getModuleStatusByName('AttitudeScheduler') == 'degraded'
-            || this.getModuleStatusByName('AttitudeFixtureManager') == 'degraded'
-            || this.getModuleStatusByName('ConfigManager') == 'errored'
-            || this.getModuleStatusByName('StatusTracker') == 'errored'
-            || this.getModuleStatusByName('NetworkModule') == 'errored') {
-
-            // set LED to blue (F) since we have an issue of some sort
-            attitudeLED.setColor('F');
-
-            // set the overall condition of the device to send to network
-            this.overallStatus = 'degraded';
-
-            return;
-        }
+        // check different modules
+        // ...
 
 
         // if none are degraded and none are errored, then we can check network
         if (this.getModuleStatusByName('NetworkModule') == 'online') {
-            // online is rainbow (A)
-            attitudeLED.setColor('A');
 
             // set the overall condition of the device to send to network
             this.overallStatus = 'online';
@@ -187,8 +139,6 @@ class ModuleStatusTracker {
         }
 
         if (this.getModuleStatusByName('NetworkModule') == 'offline') {
-            // offline is purple (B)
-            attitudeLED.setColor('B');
 
             // set the overall condition of the device to send to network
             this.overallStatus = 'offline';
