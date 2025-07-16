@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Flair Node</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			width: 1920px;
+			height: 1080px;
+			overflow: hidden;
+			background-color: black;
+			font-family: sans-serif;
+		}
+
+		#splash {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 1920px;
+			height: 1080px;
+			display: none;
+			justify-content: center;
+			align-items: center;
+			background-color: black;
+		}
+
+		#splash img {
+			width: 1920px;
+			height: 1080px;
+			object-fit: contain;
+		}
+
+		#video {
+			position: absolute;
+			top: 0;
+			left: 0;
+			display: none;
+		}
+
+		#error {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			color: white;
+			font-size: 12pt;
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<!-- Splash screen -->
+	<div id="splash">
+		<img src="file:///home/flair/Flair_Boot_128x128.png" alt="Splash Image">
+	</div>
+
+	<!-- Video -->
+	<video id="video" autoplay muted playsinline loop>
+		<source id="videoSource" type="video/mp4">
+		Your browser does not support the video tag.
+	</video>
+
+	<!-- Error message if video not found -->
+	<div id="error"></div>
+
+	<script>
+		const splash = document.getElementById('splash');
+		const video = document.getElementById('video');
+		const videoSource = document.getElementById('videoSource');
+		const error = document.getElementById('error');
+
+		const usbPaths = [
+			'/media/usb0',            // Your flair-usb-automount mount point
+			'/media/flair',
+			'/run/media/flair',
+			'/media',
+		];
+
+		const fileName = 'video.mp4';
+		let retrySeconds = 5;
+
+		function showRetryCountdown() {
+			error.style.display = 'block';
+			error.textContent = `Video file not found, retrying in ${retrySeconds}...`;
+
+			const countdown = setInterval(() => {
+				retrySeconds--;
+				if (retrySeconds <= 0) {
+					clearInterval(countdown);
+					error.style.display = 'none';
+					retrySeconds = 5;
+					tryLoadVideo();
+				} else {
+					error.textContent = `Video file not found, retrying in ${retrySeconds}...`;
+				}
+			}, 1000);
+		}
+
+		function tryLoadVideo() {
+			const path = '/media/usb0/video.mp4';
+			const fullPath = `file://${path}`;
+
+			videoSource.src = fullPath;
+			video.load();
+
+			let failed = false;
+
+			video.onerror = () => {
+				if (!failed) {
+					failed = true;
+					error.style.display = 'block';
+					error.textContent = `Could not load: ${fullPath} (retrying in ${retrySeconds}...)`;
+					showRetryCountdown();
+				}
+			};
+
+			video.onloadedmetadata = () => {
+				error.style.display = 'none';
+				video.style.width = video.videoWidth + 'px';
+				video.style.height = video.videoHeight + 'px';
+				video.style.display = 'block';
+				video.play();
+			};
+		}
+
+
+
+		// Show red, green, blue, black sequence
+		setTimeout(() => document.body.style.backgroundColor = 'red', 0);
+		setTimeout(() => document.body.style.backgroundColor = 'green', 1000);
+		setTimeout(() => document.body.style.backgroundColor = 'blue', 2000);
+		setTimeout(() => document.body.style.backgroundColor = 'black', 3000);
+
+		// Show splash
+		setTimeout(() => {
+			splash.style.display = 'flex';
+		}, 4000);
+
+		// Try to load video after splash
+		setTimeout(() => {
+			splash.style.display = 'none';
+			tryLoadVideo();
+		}, 19000);
+	</script>
+</body>
+</html>
