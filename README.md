@@ -52,8 +52,24 @@ ExecStart=-/sbin/agetty --autologin flair --noclear %I $TERM
 `sudo reboot`
 
 
+## 3. Install GUI Layer
 
+### Installs
 
+`sudo apt update`
+
+```
+sudo apt install -y --no-install-recommends \
+  xserver-xorg \
+  x11-xserver-utils \
+  xinit \
+  openbox \
+  unclutter \
+  xdotool
+```
+
+### Chrome Directly
+`sudo apt install -y -t noble chromium`
 
 
 
