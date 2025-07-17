@@ -2,10 +2,13 @@
  
 Flair Node device firmware, version 1.0
 
+---
 
-## How To Set Up A New Flair Node
+# How To Set Up A New Flair Node
 
-### 1. User Setup
+## 1. User Setup
+
+### Root & Users
 
 Root PW: `_`
 
@@ -18,15 +21,44 @@ detected location
 
 don't generate locales (7)
 
-Hostname:
+### Hostname:
 `nano /etc/hostname`
 set to `flairnode`
 
-Hosts:
+### Hosts:
 `nano /etc/hosts`
 set to `flairnode` where relvant
 
 - Switch to ssh from this point forward
+
+## 2. GETTY TTY1 SERVICE
+
+### Create Service Directory & Files
+
+`sudo mkdir -p /etc/systemd/system/getty@tty1.service.d`
+
+`sudo nano /etc/systemd/system/getty@tty1.service.d/override.conf`
+
+### Service File
+```
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin flair --noclear %I $TERM
+```
+
+### Start It
+`sudo systemctl daemon-reexec && sudo systemctl daemon-reload`
+
+`sudo reboot`
+
+
+
+
+
+
+
+
+
 
 
 
