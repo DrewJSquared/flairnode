@@ -196,6 +196,10 @@ System initializing...
 					showIdentifyScreen(false, data?.serial_number);
 					break;
 
+				case 'disable_identify_mode':
+					hideIdentifyScreen();
+					break;
+
 				default:
 					console.warn(`Unknown command: ${command}`);
 			}
@@ -254,6 +258,14 @@ System initializing...
 
 			// inject grid into target
 			targetDiv.innerHTML = gridHtml;
+		}
+
+		function hideIdentifyScreen() {
+			const yesDiv = document.getElementById('identifyThisNodeScreen');
+			const noDiv = document.getElementById('identifyNotThisNodeScreen');
+
+			yesDiv.style.display = 'none';
+			noDiv.style.display = 'none';
 		}
 
 

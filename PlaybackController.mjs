@@ -81,6 +81,9 @@ class PlaybackController {
 	    				serial_number: idManager.getSerialNumber(), 
 	    			});
 				}
+			} else {
+				RenderSocketClient.send('disable_identify_mode', { 
+    			});
 			}
 
 
