@@ -345,6 +345,9 @@ class NetworkModule {
     		if (configManager.checkLogLevel('detail')) {
     			logger.info('Successfully processed response data from server!');
     		}
+
+			// emit an event for new data handled
+    		eventHub.emit('newNetworkDataProcessed');
     	} catch (error) {
 			// log error to logger, which will show in console and queue log to be sent to server
     		logger.error(`Error during response handling: ${error.message}`);

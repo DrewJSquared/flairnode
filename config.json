@@ -4,5 +4,9 @@
   "serial_number": "FN-0000001",
   "logLevel": "none",
   "reboot": false,
-  "update": false
+  "update": false,
+  "identify_mode": true,
+  "identify_until": "2025-07-16T23:56:36.000000Z",
+  "now": "2025-07-16T23:51:46.554722Z",
+  "identify_target": true
 }

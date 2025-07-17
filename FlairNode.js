@@ -20,6 +20,7 @@ import macrosModule from './MacrosModule.mjs';
 import udpManager from './UDPManager.mjs';
 
 import renderSocketClient from './RenderSocketClient.mjs';
+import playbackController from './PlaybackController.mjs';
 
 
 
@@ -54,6 +55,12 @@ setTimeout(() => {
 	statusTracker.init();
 	moduleStatusTracker.init();
 }, 40);
+
+
+// initialize playback controller
+setTimeout(() => {
+	playbackController.init();
+}, 50);
 
 
 // initialize macros module
