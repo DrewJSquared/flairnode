@@ -188,6 +188,11 @@ System initializing...
 			bootScreen.style.display = 'none';
 
 			switch (command) {
+				case 'reload_page':
+					console.warn('Reloading page via remote command...');
+					location.reload();
+					break;
+
 				case 'identify_this_node':
 					showIdentifyScreen(true, data?.serial_number);
 					break;

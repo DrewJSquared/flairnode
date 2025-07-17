@@ -232,6 +232,11 @@ class ConfigManager {
 		return this.config?.reboot ?? false;
 	}
 
+	// reload
+	getReload() {
+		return this.config?.reload ?? false;
+	}
+
 	// update
 	getUpdate() {
 		return this.config?.update ?? false;
