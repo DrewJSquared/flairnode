@@ -8,7 +8,7 @@
   "identify_mode": false,
   "identify_until": "2025-07-16T23:56:36.000000Z",
   "now": "2025-07-16T23:51:46.554722Z",
-  "identify_target": true,
+  "identify_target": false,
   "reload": false,
   "timezone": "America/New_York",
   "wall_type": {
