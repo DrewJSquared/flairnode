@@ -48,6 +48,8 @@
 	<!-- Identify not this node -->
 	<div id="identifyNotThisNodeScreen" style="display: none; background-color: red; width: 100%; height: 100%; position: absolute; overflow: hidden;"></div>
 
+	<!-- wall type zones layout -->
+	<div id="wallTypeZonesLayout" style="position: relative; width: 100%; height: 100%;"></div>
 
 
 	<script>
@@ -205,6 +207,10 @@ System initializing...
 					hideIdentifyScreen();
 					break;
 
+				case 'show_wall_type_zones_layout':
+					showWallTypeZonesLayout(data);
+					break;
+
 				default:
 					console.warn(`Unknown command: ${command}`);
 			}
@@ -273,6 +279,61 @@ System initializing...
 			noDiv.style.display = 'none';
 		}
 
+
+
+
+
+
+
+		function showWallTypeZonesLayout(data) {
+			const container = document.getElementById('wallTypeZonesLayout');
+
+			// Clear existing content
+			container.innerHTML = '';
+
+			// Loop through each zone
+			data.zones.forEach(zone => {
+				const zoneDiv = document.createElement('div');
+				zoneDiv.style.position = 'absolute';
+				zoneDiv.style.left = `${zone.x}px`;
+				zoneDiv.style.top = `${zone.y}px`;
+				zoneDiv.style.width = `${zone.width}px`;
+				zoneDiv.style.height = `${zone.height}px`;
+				zoneDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+				zoneDiv.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+				zoneDiv.style.color = 'white';
+				zoneDiv.style.padding = '8px';
+				zoneDiv.style.fontSize = '14px';
+				zoneDiv.style.fontWeight = '500';
+				zoneDiv.style.boxSizing = 'border-box';
+
+				const innerDiv = document.createElement('div');
+				innerDiv.style.width = '100%';
+				innerDiv.style.height = '100%';
+				innerDiv.style.display = 'flex';
+				innerDiv.style.flexDirection = 'column';
+				innerDiv.style.justifyContent = 'center';
+				innerDiv.style.alignItems = 'center';
+				innerDiv.style.textAlign = 'center';
+				innerDiv.style.lineHeight = '1.2';
+				innerDiv.style.padding = '4px';
+				innerDiv.style.wordBreak = 'break-word';
+
+				// Calculate responsive font size
+				const fontSize = Math.min(Math.min(zone.width, zone.height) * 0.15, 30);
+				innerDiv.style.fontSize = `${fontSize}px`;
+
+				// Set inner text
+				innerDiv.innerHTML = `
+					<div>${zone.name}</div>
+					<div>${zone.width}x${zone.height}px</div>
+				`;
+
+				// Append inner to outer
+				zoneDiv.appendChild(innerDiv);
+				container.appendChild(zoneDiv);
+			});
+		}
 
 
 

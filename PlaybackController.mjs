@@ -67,10 +67,8 @@ class PlaybackController {
 		try {
 
 
-			// check for identify mode/target
+			// check for identify mode
 			const identifyMode = configManager.getIdentifyMode();
-			const identifyTarget = configManager.getIdentifyTarget();
-
 			if (identifyMode == true) {
 				if (identifyTarget == true) {
 					RenderSocketClient.send('identify_this_node', { 
@@ -81,10 +79,44 @@ class PlaybackController {
 	    				serial_number: idManager.getSerialNumber(), 
 	    			});
 				}
-			} else {
-				RenderSocketClient.send('disable_identify_mode', { 
-    			});
 			}
+
+			// get wall type info
+			const wallType = configManager.getWallType();
+
+			if (!wallType) {
+				logger.warn(`No wall type found, unable to show wall type zones.`);
+				return;
+			}
+
+			// get zones array from wallType.canvas.zones or fallback
+			const zones = wallType.canvas?.zones ?? [];
+
+			// send layout to frontend
+			RenderSocketClient.send('show_wall_type_zones_layout', { zones });
+
+			// TODO: Handle Scene playback logic when role is assigned
+
+
+
+			// // check for identify mode/target
+			// const identifyMode = configManager.getIdentifyMode();
+			// const identifyTarget = configManager.getIdentifyTarget();
+
+			// if (identifyMode == true) {
+			// 	if (identifyTarget == true) {
+			// 		RenderSocketClient.send('identify_this_node', { 
+	    	// 			serial_number: idManager.getSerialNumber(), 
+	    	// 		});
+			// 	} else {
+			// 		RenderSocketClient.send('identify_not_this_node', { 
+	    	// 			serial_number: idManager.getSerialNumber(), 
+	    	// 		});
+			// 	}
+			// } else {
+			// 	RenderSocketClient.send('disable_identify_mode', { 
+    		// 	});
+			// }
 
 
 		} catch (error) {

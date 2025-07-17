@@ -196,6 +196,11 @@ class ConfigManager {
         return this.config.identify_target ?? false;
 	}
 
+	// wall type
+	getWallType() {
+        return this.config.wall_type ?? null;
+	}
+
 
 	// timezone
 	// getDeviceTimezone() {

@@ -17,37 +17,29 @@
         {
           "x": 0,
           "y": 0,
+          "id": 1,
+          "name": "Top",
+          "width": 1024,
+          "height": 256
+        },
+        {
+          "x": 0,
+          "y": 256,
           "id": 2,
-          "name": "Main Zone",
-          "width": 768,
-          "height": 128
+          "name": "Left",
+          "width": 128,
+          "height": 512
         },
         {
-          "x": 0,
-          "y": 384,
+          "x": 896,
+          "y": 256,
           "id": 3,
-          "name": "Main Zone (copy)",
-          "width": 768,
-          "height": 128
-        },
-        {
-          "x": 0,
-          "y": 128,
-          "id": 4,
-          "name": "asdf",
+          "name": "Right",
           "width": 128,
-          "height": 256
-        },
-        {
-          "x": 640,
-          "y": 128,
-          "id": 5,
-          "name": "asdf (copy)",
-          "width": 128,
-          "height": 256
+          "height": 512
         }
       ]
     },
-    "finalized": true
+    "finalized": false
   }
 }

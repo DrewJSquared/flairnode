@@ -284,7 +284,7 @@ class NetworkModule {
 		// then handle the data from the response
 		.then(data => {
 			// console log raw response data
-			console.log(data);
+			// console.log(data);
 
     		// handle the response data
     		this.handleResponse(data);
@@ -337,6 +337,8 @@ class NetworkModule {
 
     		// JSON parse the raw data from the server
     		let data = JSON.parse(rawData);
+
+    		// console.log(data);
 
     		// update the config manager with the new data
     		configManager.update(data);
