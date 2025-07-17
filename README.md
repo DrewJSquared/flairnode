@@ -5,9 +5,28 @@ Flair Node device firmware, version 1.0
 
 ## How To Set Up A New Flair Node
 
+### 1. User Setup
 
+Root PW: `_`
 
+User: `flair`
+PW: `_`
 
+real name: Flair
+
+detected location
+
+don't generate locales (7)
+
+Hostname:
+`nano /etc/hostname`
+set to `flairnode`
+
+Hosts:
+`nano /etc/hosts`
+set to `flairnode` where relvant
+
+- Switch to ssh from this point forward
 
 
 
