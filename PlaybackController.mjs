@@ -21,8 +21,6 @@ const logger = new Logger('PlaybackController');
 
 // variables
 const INTERVAL_MS = 1000;  // how often to attempt processPlayback
-let lastRunTime = 0;
-let isRunning = false;
 
 
 
@@ -33,6 +31,9 @@ class PlaybackController {
 	constructor() {
 		// setup interval
 		this.interval = INTERVAL_MS;
+		this.lastRunTime = 0;
+		this.isRunning = false;
+		this.startTime = Date.now();
 	}
 
 
@@ -47,7 +48,7 @@ class PlaybackController {
 		setInterval(() => {
 			const now = Date.now();
 
-			if (!isRunning && now - lastRunTime >= this.interval) {
+			if (!this.isRunning && now - this.lastRunTime >= this.interval) {
 				this.processPlayback();
 			}
 		}, this.interval);
@@ -61,8 +62,8 @@ class PlaybackController {
 	// core playback handler
 	processPlayback() {
 		// mark as running
-		isRunning = true;
-		lastRunTime = Date.now();
+		this.isRunning = true;
+		this.lastRunTime = Date.now();
 
 		try {
 
@@ -99,7 +100,20 @@ class PlaybackController {
 				const zones = wallType.canvas?.zones ?? [];
 
 				// send layout to frontend
-				RenderSocketClient.send('show_wall_type_zones_layout', { zones });
+				// DEFAULT VERSION NO TIME DATA
+				// RenderSocketClient.send('show_wall_type_zones_layout', { zones });
+
+				const currentTime = new Date().toLocaleTimeString();
+				const uptime = this.getUptimeString();
+
+				const enhancedZones = zones.map(zone => ({
+					...zone,
+					time_of_day: currentTime,
+					uptime: uptime,
+				}));
+
+				RenderSocketClient.send('show_wall_type_zones_layout_with_time', { zones: enhancedZones });
+
 
 				// TODO: Handle Scene playback logic when role is assigned
 			}
@@ -132,8 +146,17 @@ class PlaybackController {
 			logger.error(`Error in processPlayback: ${error.message}`);
 		} finally {
 			// mark done
-			isRunning = false;
+			this.isRunning = false;
 		}
+	}
+
+
+	getUptimeString() {
+		const seconds = Math.floor((Date.now() - this.startTime) / 1000);
+		const h = Math.floor(seconds / 3600);
+		const m = Math.floor((seconds % 3600) / 60);
+		const s = seconds % 60;
+		return `${h}h ${m}m ${s}s`;
 	}
 }
 

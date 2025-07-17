@@ -228,6 +228,13 @@ System initializing...
 					showWallTypeZonesLayout(data);
 					break;
 
+				case 'show_wall_type_zones_layout_with_time':
+					hideIdentifyScreen();
+					hideSerialNumberScreen();
+					showWallTypeZonesLayoutWithTime(data);
+					break;
+
+
 				default:
 					console.warn(`Unknown command: ${command}`);
 			}
@@ -408,6 +415,68 @@ System initializing...
 		function hideWallTypesLayout() {
 			const container = document.getElementById('wallTypeZonesLayout');
 			container.style.display = 'none';
+		}
+
+
+
+
+
+		function showWallTypeZonesLayoutWithTime(data) {
+			const container = document.getElementById('wallTypeZonesLayout');
+
+			// Clear existing content
+			container.style.display = 'block';
+			container.innerHTML = '';
+
+			// Loop through each zone
+			data.zones.forEach(zone => {
+				const zoneDiv = document.createElement('div');
+				zoneDiv.style.position = 'absolute';
+				zoneDiv.style.left = `${zone.x}px`;
+				zoneDiv.style.top = `${zone.y}px`;
+				zoneDiv.style.width = `${zone.width}px`;
+				zoneDiv.style.height = `${zone.height}px`;
+				zoneDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+				zoneDiv.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+				zoneDiv.style.color = 'white';
+				zoneDiv.style.padding = '2px';
+				zoneDiv.style.fontSize = '14px';
+				zoneDiv.style.fontWeight = '500';
+				zoneDiv.style.boxSizing = 'border-box';
+
+				const innerDiv = document.createElement('div');
+				innerDiv.style.width = '100%';
+				innerDiv.style.height = '100%';
+				innerDiv.style.display = 'flex';
+				innerDiv.style.flexDirection = 'column';
+				innerDiv.style.justifyContent = 'center';
+				innerDiv.style.alignItems = 'center';
+				innerDiv.style.textAlign = 'center';
+				innerDiv.style.lineHeight = '1.2';
+				innerDiv.style.padding = '0px';
+				innerDiv.style.wordBreak = 'break-word';
+
+				// Calculate responsive font size
+				const fontSize = Math.min(Math.min(zone.width, zone.height) * 0.15, 30);
+				innerDiv.style.fontSize = `${fontSize}px`;
+
+				// Set inner text
+				innerDiv.innerHTML = `
+					<br>
+					<div>${zone.name}</div>
+					<div>(${zone.x}, ${zone.y})</div>
+					<div>${zone.width}x${zone.height}px</div>
+					<br>
+					<div>Uptime: ${zone.uptime}</div>
+					<br>
+					<div>Current Time: ${zone.time_of_day}</div>
+					<br>
+				`;
+
+				// Append inner to outer
+				zoneDiv.appendChild(innerDiv);
+				container.appendChild(zoneDiv);
+			});
 		}
 
 
