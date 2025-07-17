@@ -3,7 +3,18 @@
 Flair Node device firmware, version 1.0
 
 
-## How to Install From Scratch (old to update)
+## How To Set Up A New Flair Node
+
+
+
+
+
+
+
+
+
+
+## How to Install From Scratch
 Download the GitHub repository as a zip file
 `curl -L -o attitudecontrol2a.zip "https://github.com/DrewJSquared/attitudecontrol2a/archive/refs/heads/main.zip"`
 
