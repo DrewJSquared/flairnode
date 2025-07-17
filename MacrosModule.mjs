@@ -12,6 +12,7 @@
 import { exec } from 'child_process';
 import fs from 'fs';
 import eventHub from './EventHub.mjs';
+import renderSocketClient from './RenderSocketClient.mjs';
 
 import Logger from './Logger.mjs';
 const logger = new Logger('MacrosModule');
@@ -37,12 +38,15 @@ class MacrosModule {
 
         // variables
         this.rebootQueuedFromServer = false;
+        this.reloadQueuedFromServer = false;
         this.updateQueuedFromServer = false;
 
         this.rebootCommandSuccess = false;
+        this.reloadCommandSuccess = false;
         this.updateCommandSuccess = false;
 
         this.rebootCommandResults = '';
+        this.reloadCommandResults = '';
         this.updateCommandResults = '';
 
         // emit an event that the macros module is operational
@@ -84,7 +88,7 @@ class MacrosModule {
 
         // run the two different macro functions as promises
         Promise.race([
-            Promise.all([this.handleReboot(), this.handleUpdate()]), // race these two promises 
+            Promise.all([this.handleReboot(), this.handleReload(), this.handleUpdate()]), // race these two promises 
             timeoutPromise // with the timeout promise
         ])
         .then((results) => {
@@ -123,6 +127,7 @@ class MacrosModule {
     // get updated config from configManager
     getUpdatedConfig() {
         this.rebootQueuedFromServer = configManager.getReboot();
+        this.reloadQueuedFromServer = configManager.getReload();
         this.updateQueuedFromServer = configManager.getUpdate();
     }
 
@@ -205,6 +210,36 @@ class MacrosModule {
 
                 // resolve with a n/a message
                 resolve('No reboot queued from server.');
+            }
+        });
+    }
+
+
+    // handle reload command
+    handleReload() {
+        // return a promise
+        return new Promise((resolve, reject) => {
+        
+            // check if a reboot command has been queued from the server
+            if (this.reloadQueuedFromServer == true) {
+
+                // send reload_page to render client
+                renderSocketClient.send('reload_page');
+
+                // store results
+                this.reloadCommandSuccess = true;
+                this.reloadCommandResults = 'Reload command sent to render client.';
+
+                // resolve with success
+                resolve(this.reloadCommandResults);
+
+            } else {
+                // otherwise, we don't need to reboot, so ensure that rebootCommandResults is reset
+                this.reloadCommandSuccess = false;
+                this.reloadCommandResults = '';
+
+                // resolve with a n/a message
+                resolve('No reload queued from server.');
             }
         });
     }
@@ -317,7 +352,7 @@ class MacrosModule {
     // emit a macros event to the system
     emitMacrosEvent() {
         // check if any macros had been queued from the server
-        if (this.rebootQueuedFromServer || this.restartQueuedFromServer || this.updateQueuedFromServer) {
+        if (this.rebootQueuedFromServer || this.reloadQueuedFromServer || this.updateQueuedFromServer) {
 
             // log
             if (configManager.checkLogLevel('detail')) {
@@ -329,6 +364,10 @@ class MacrosModule {
                 rebootQueuedFromServer: this.rebootQueuedFromServer,
                 rebootCommandSuccess: this.rebootCommandSuccess,
                 rebootCommandResults: this.rebootCommandResults,
+
+                reloadQueuedFromServer: this.reloadQueuedFromServer,
+                reloadCommandSuccess: this.reloadCommandSuccess,
+                reloadCommandResults: this.reloadCommandResults,
 
                 updateQueuedFromServer: this.updateQueuedFromServer,
                 updateCommandSuccess: this.updateCommandSuccess,

@@ -4,5 +4,42 @@
   "serial_number": "FN-0000001",
   "logLevel": "none",
   "reboot": false,
-  "update": false
+  "update": false,
+  "identify_mode": false,
+  "identify_until": "2025-07-16T23:56:36.000000Z",
+  "now": "2025-07-16T23:51:46.554722Z",
+  "identify_target": false,
+  "reload": false,
+  "timezone": "America/New_York",
+  "wall_type": {
+    "canvas": {
+      "zones": [
+        {
+          "x": 0,
+          "y": 0,
+          "id": 1,
+          "name": "Top",
+          "width": 1024,
+          "height": 256
+        },
+        {
+          "x": 0,
+          "y": 256,
+          "id": 2,
+          "name": "Left",
+          "width": 128,
+          "height": 512
+        },
+        {
+          "x": 896,
+          "y": 256,
+          "id": 3,
+          "name": "Right",
+          "width": 128,
+          "height": 512
+        }
+      ]
+    },
+    "finalized": false
+  }
 }

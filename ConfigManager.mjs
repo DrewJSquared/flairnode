@@ -186,10 +186,20 @@ class ConfigManager {
 
 	// EXAMPLE:
 
-	// shows
-	// getShows() {
-    //     return this.config.shows ?? [];
-	// }
+	// identify mode
+	getIdentifyMode() {
+        return this.config.identify_mode ?? false;
+	}
+
+	// identify target
+	getIdentifyTarget() {
+        return this.config.identify_target ?? false;
+	}
+
+	// wall type
+	getWallType() {
+        return this.config.wall_type ?? null;
+	}
 
 
 	// timezone
@@ -227,19 +237,14 @@ class ConfigManager {
 		return this.config?.reboot ?? false;
 	}
 
-	// restart
-	getRestart() {
-		return this.config?.restart ?? false;
+	// reload
+	getReload() {
+		return this.config?.reload ?? false;
 	}
 
 	// update
 	getUpdate() {
 		return this.config?.update ?? false;
-	}
-
-	// autoupdate
-	getAutoupdate() {
-		return this.config?.autoupdate ?? false;
 	}
 
 
