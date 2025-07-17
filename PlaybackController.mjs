@@ -69,6 +69,7 @@ class PlaybackController {
 
 			// check for identify mode
 			const identifyMode = configManager.getIdentifyMode();
+			const identifyTarget = configManager.getIdentifyTarget();
 			if (identifyMode == true) {
 				if (identifyTarget == true) {
 					RenderSocketClient.send('identify_this_node', { 
@@ -79,23 +80,31 @@ class PlaybackController {
 	    				serial_number: idManager.getSerialNumber(), 
 	    			});
 				}
+			} else {
+				// get wall type info
+				const wallType = configManager.getWallType();
+
+				if (!wallType) {
+					logger.warn(`No wall type found, unable to show wall type zones.`);
+
+					// Fallback: show serial number if nothing else is active
+					RenderSocketClient.send('show_serial_number', { 
+	    				serial_number: idManager.getSerialNumber(), 
+	    			});
+
+					return;
+				}
+
+				// get zones array from wallType.canvas.zones or fallback
+				const zones = wallType.canvas?.zones ?? [];
+
+				// send layout to frontend
+				RenderSocketClient.send('show_wall_type_zones_layout', { zones });
+
+				// TODO: Handle Scene playback logic when role is assigned
 			}
 
-			// get wall type info
-			const wallType = configManager.getWallType();
-
-			if (!wallType) {
-				logger.warn(`No wall type found, unable to show wall type zones.`);
-				return;
-			}
-
-			// get zones array from wallType.canvas.zones or fallback
-			const zones = wallType.canvas?.zones ?? [];
-
-			// send layout to frontend
-			RenderSocketClient.send('show_wall_type_zones_layout', { zones });
-
-			// TODO: Handle Scene playback logic when role is assigned
+			
 
 
 

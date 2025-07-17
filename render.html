@@ -48,6 +48,9 @@
 	<!-- Identify not this node -->
 	<div id="identifyNotThisNodeScreen" style="display: none; background-color: red; width: 100%; height: 100%; position: absolute; overflow: hidden;"></div>
 
+	<!-- serial number -->
+	<div id="serialNumberScreen" style="display: none; background-color: black; width: 100%; height: 100%; position: absolute; overflow: hidden;"></div>
+
 	<!-- wall type zones layout -->
 	<div id="wallTypeZonesLayout" style="position: relative; width: 100%; height: 100%;"></div>
 
@@ -144,7 +147,7 @@ System initializing...
 		}
 
 		// connect web socket after 14 sec (4 sec RGB test 10 sec boot screen)
-		setTimeout(connectWebSocket, 14000);
+		setTimeout(connectWebSocket, 1400);
 
 
 		// === Global crash guard ===
@@ -196,18 +199,32 @@ System initializing...
 					break;
 
 				case 'identify_this_node':
+					hideWallTypesLayout();
+					hideSerialNumberScreen();
 					showIdentifyScreen(true, data?.serial_number);
 					break;
 
 				case 'identify_not_this_node':
+					hideWallTypesLayout();
+					hideSerialNumberScreen();
 					showIdentifyScreen(false, data?.serial_number);
+					break;
+
+				case 'show_serial_number':
+					hideIdentifyScreen();
+					hideWallTypesLayout();
+					showSerialNumberScreen(data?.serial_number);
 					break;
 
 				case 'disable_identify_mode':
 					hideIdentifyScreen();
+					hideSerialNumberScreen();
+					hideWallTypesLayout();
 					break;
 
 				case 'show_wall_type_zones_layout':
+					hideIdentifyScreen();
+					hideSerialNumberScreen();
 					showWallTypeZonesLayout(data);
 					break;
 
@@ -281,6 +298,57 @@ System initializing...
 
 
 
+		function showSerialNumberScreen(serialNumber = 'UNKNOWN') {
+			const targetDiv = document.getElementById('serialNumberScreen');
+
+			// set up targetDiv as a grid
+			targetDiv.style.display = 'grid';
+			targetDiv.style.gridTemplateColumns = 'repeat(auto-fill, minmax(180px, 1fr))';
+			targetDiv.style.gridAutoRows = '60px'; // fixed row height
+			targetDiv.style.gap = '0px';
+			targetDiv.style.padding = '5px';
+			targetDiv.style.color = 'white';
+			targetDiv.style.fontSize = '16px';
+			targetDiv.style.fontFamily = 'monospace';
+			targetDiv.style.overflow = 'hidden';
+			targetDiv.style.height = '100vh'; // full screen height
+
+			// define text for each block
+			const text = `${serialNumber}`;
+
+			// generate grid cells
+			const totalBlocks = 170;
+			let gridHtml = '';
+
+			for (let i = 0; i < totalBlocks; i++) {
+				gridHtml += `
+					<div style="
+						background: none;
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						justify-content: center;
+						text-align: center;
+						width: 180px;
+						height: 60px;
+					">
+						${text}
+					</div>
+				`;
+			}
+
+			// inject grid into target
+			targetDiv.innerHTML = gridHtml;
+		}
+
+		function hideSerialNumberScreen() {
+			const targetDiv = document.getElementById('serialNumberScreen');
+
+			targetDiv.style.display = 'none';
+		}
+
+
+
 
 
 
@@ -289,6 +357,7 @@ System initializing...
 			const container = document.getElementById('wallTypeZonesLayout');
 
 			// Clear existing content
+			container.style.display = 'block';
 			container.innerHTML = '';
 
 			// Loop through each zone
@@ -302,7 +371,7 @@ System initializing...
 				zoneDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
 				zoneDiv.style.border = '1px solid rgba(255, 255, 255, 0.3)';
 				zoneDiv.style.color = 'white';
-				zoneDiv.style.padding = '8px';
+				zoneDiv.style.padding = '2px';
 				zoneDiv.style.fontSize = '14px';
 				zoneDiv.style.fontWeight = '500';
 				zoneDiv.style.boxSizing = 'border-box';
@@ -316,7 +385,7 @@ System initializing...
 				innerDiv.style.alignItems = 'center';
 				innerDiv.style.textAlign = 'center';
 				innerDiv.style.lineHeight = '1.2';
-				innerDiv.style.padding = '4px';
+				innerDiv.style.padding = '0px';
 				innerDiv.style.wordBreak = 'break-word';
 
 				// Calculate responsive font size
@@ -326,6 +395,7 @@ System initializing...
 				// Set inner text
 				innerDiv.innerHTML = `
 					<div>${zone.name}</div>
+					<div>(${zone.x}, ${zone.y})</div>
 					<div>${zone.width}x${zone.height}px</div>
 				`;
 
@@ -333,6 +403,11 @@ System initializing...
 				zoneDiv.appendChild(innerDiv);
 				container.appendChild(zoneDiv);
 			});
+		}
+
+		function hideWallTypesLayout() {
+			const container = document.getElementById('wallTypeZonesLayout');
+			container.style.display = 'none';
 		}
 
 

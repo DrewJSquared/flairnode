@@ -8,7 +8,7 @@
   "identify_mode": false,
   "identify_until": "2025-07-16T23:56:36.000000Z",
   "now": "2025-07-16T23:51:46.554722Z",
-  "identify_target": false,
+  "identify_target": true,
   "reload": false,
   "timezone": "America/Chicago",
   "wall_type": {
@@ -18,7 +18,7 @@
           "x": 0,
           "y": 0,
           "id": 1,
-          "name": "Top",
+          "name": "Main Zone",
           "width": 1024,
           "height": 256
         },
