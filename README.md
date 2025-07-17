@@ -68,14 +68,92 @@ sudo apt install -y --no-install-recommends \
   xdotool
 ```
 
-### Chrome Directly
+### Install Chrome Directly
 `sudo apt install -y -t noble chromium`
 
 
+## 4. BASH PROFILE
+Setup bash profile script
+`cd /home/flair/ && sudo nano .bash_profile`
+
+Contents
+```
+if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+        echo "Launching X server via .bash_profile..."
+        startx > /dev/null 2>&1
+fi
+```
+
+## 5. Xserver Config (window management)
+Open config file:
+`nano ~/.xinitrc`
+
+Contents:
+```
+#!/bin/sh
+
+# Start the window manager first
+openbox-session &
+
+# Wait briefly to ensure X and Openbox are ready
+sleep 0.5
+
+# Disable screen blanking and power saving
+xset s off           # Disable screen saver
+xset s noblank       # Prevent screen blanking
+xset -dpms           # Disable energy-saving features
+xset dpms 0 0 0      # Just in case, set timers to 0
+
+# Move mouse to bottom-right corner (1920x1080 screen)
+xdotool mousemove 1919 1079
+
+# Hide cursor after 1 second of inactivity
+unclutter -idle 1 &
+
+# Launch Chromium in kiosk mode — this stays in foreground
+chromium \
+        --noerrdialogs \
+        --disable-infobars \
+        --disable-session-crashed-bubble \
+        --disable-translate \
+        --disable-features=TranslateUI \
+        --disable-component-update \
+        --disable-background-networking \
+        --disable-sync \
+        --metrics-recording-only \
+        --no-first-run \
+        --autoplay-policy=no-user-gesture-required \
+        --start-fullscreen \
+        --kiosk file:///home/flair/usbvideo.html \
+        --window-size=1920,1080 \
+        --window-position=0,0 \
+        --window-background-color="#000000" \
+  --force-device-scale-factor=1 \
+        --user-data-dir=/home/flair/.flair-profile
+```
 
 
+## 6. Boot Config
+`sudo nano /boot/armbianEnv.txt`
 
+File contents:
+```
+verbosity=0
+bootlogo=true
+disp_mode=1920x1080p60
+console=serial
+overlay_prefix=meson
+rootdev=UUID=f5fb71ca-255e-4afd-b19f-047a7ac3bfa2
+rootfstype=ext4
+usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
+extraargs=splash quiet vt.global_cursor_default=0 consoleblank=0
+```
 
+Then recompile: 
+`cd /boot && sudo mkimage -C none -A arm -T script -d boot.cmd boot.scr`
+
+Disable MOTD:???????
+`sudo systemctl disable armbian-motd`
 
 
 
