@@ -12,7 +12,7 @@
 import { exec } from 'child_process';
 import fs from 'fs';
 import eventHub from './EventHub.mjs';
-import RenderSocketClient from './RenderSocketClient.mjs';
+import renderSocketClient from './RenderSocketClient.mjs';
 
 import Logger from './Logger.mjs';
 const logger = new Logger('MacrosModule');

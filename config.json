@@ -9,5 +9,45 @@
   "identify_until": "2025-07-16T23:56:36.000000Z",
   "now": "2025-07-16T23:51:46.554722Z",
   "identify_target": false,
-  "reload": true
+  "reload": false,
+  "timezone": "America/Chicago",
+  "wall_type": {
+    "canvas": {
+      "zones": [
+        {
+          "x": 0,
+          "y": 0,
+          "id": 2,
+          "name": "Main Zone",
+          "width": 768,
+          "height": 128
+        },
+        {
+          "x": 0,
+          "y": 384,
+          "id": 3,
+          "name": "Main Zone (copy)",
+          "width": 768,
+          "height": 128
+        },
+        {
+          "x": 0,
+          "y": 128,
+          "id": 4,
+          "name": "asdf",
+          "width": 128,
+          "height": 256
+        },
+        {
+          "x": 640,
+          "y": 128,
+          "id": 5,
+          "name": "asdf (copy)",
+          "width": 128,
+          "height": 256
+        }
+      ]
+    },
+    "finalized": true
+  }
 }
