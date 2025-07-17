@@ -10,7 +10,7 @@
   "now": "2025-07-16T23:51:46.554722Z",
   "identify_target": true,
   "reload": false,
-  "timezone": "America/Chicago",
+  "timezone": "America/New_York",
   "wall_type": {
     "canvas": {
       "zones": [
@@ -18,7 +18,7 @@
           "x": 0,
           "y": 0,
           "id": 1,
-          "name": "Main Zone",
+          "name": "Top",
           "width": 1024,
           "height": 256
         },
