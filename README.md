@@ -22,11 +22,11 @@ detected location
 don't generate locales (7)
 
 ### Hostname:
-`nano /etc/hostname`
+`sudo nano /etc/hostname`
 set to `flairnode`
 
 ### Hosts:
-`nano /etc/hosts`
+`sudo nano /etc/hosts`
 set to `flairnode` where relvant
 
 ### Reboot
@@ -68,7 +68,8 @@ sudo apt install -y --no-install-recommends \
   xinit \
   openbox \
   unclutter \
-  xdotool
+  xdotool \
+  unzip
 ```
 
 ### Install Chrome Directly
@@ -190,7 +191,7 @@ Add this line to end
 ### Download & Unzip
 Download the GitHub repository as a zip file
 
-`curl -L -o flairnode.zip "https://github.com/DrewJSquared/flairnode/archive/refs/heads/main.zip"`
+`cd /home/flair/ && curl -L -o flairnode.zip "https://github.com/DrewJSquared/flairnode/archive/refs/heads/main.zip"`
 
 Unzip the downloaded file
 
@@ -232,23 +233,16 @@ Copy/Paste the following for id.json
 ## 8. NVM, Node, & PM2 Setup
 
 ### Install NVM
-`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash `
+`cd /home/flair/ && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash `
+
 Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
 
 ### Install NodeJS, NPM, & PM2
 `nvm install 18 && npm install pm2 -g`
 
-### Add PM2 to .bashrc
-`cd /home/flair/ && nano .bashrc`
-
-Add this to the file:
-```
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-```
-
 ### Setup PM2 Processes
 `cd /home/flair/flairnode && pm2 start FlairNode.js && pm2 save && pm2 startup`
+
 (and copy/paste startup script to save startup)
 
 
@@ -267,7 +261,7 @@ Setup service file: `sudo nano /etc/systemd/system/flairssh.service`
 Copy this into the new file: 
 ```
 [Unit]
-Description=Attitude SSH
+Description=Flair Node SSH
 After=network.target
 StartLimitIntervalSec=0
 
@@ -275,7 +269,7 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=1
-User=attitude
+User=flair
 ExecStart=autossh -R flairnode-00100XX:22:localhost:22 serveo.net
 
 [Install]
