@@ -236,7 +236,7 @@ Install autossh & test connection: `sudo apt install autossh && autossh -R flair
 (Be sure to change the serial number!)
 (and test connection and accept key for Serveo.net else it wont work!!!)
 
-Setup service file: `sudo nano /etc/systemd/system/attitudessh.service`
+Setup service file: `sudo nano /etc/systemd/system/flairssh.service`
 
 Copy this into the new file: 
 ```
@@ -250,14 +250,14 @@ Type=simple
 Restart=always
 RestartSec=1
 User=attitude
-ExecStart=autossh -R attitudecontrol-00200XX:22:localhost:22 serveo.net
+ExecStart=autossh -R flairnode-00100XX:22:localhost:22 serveo.net
 
 [Install]
 WantedBy=multi-user.target
 ```
 (Be sure to change the serial number!)
 
-Start service: `systemctl start attitudessh.service && systemctl enable attitudessh.service`
+Start service: `systemctl start flairssh.service && systemctl enable flairssh.service`
 
 
 
