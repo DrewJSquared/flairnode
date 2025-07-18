@@ -82,6 +82,10 @@ Setup bash profile script
 
 Contents
 ```
+if [ -f ~/.bashrc ]; then
+  . ~/.bashrc
+fi
+
 if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
         echo "Launching X server via .bash_profile..."
         startx > /dev/null 2>&1
@@ -139,6 +143,9 @@ chromium \
 
 
 ## 6. Boot Config
+
+### Boot Setup
+
 Open file
 
 `sudo nano /boot/armbianEnv.txt`
@@ -160,9 +167,19 @@ Then recompile:
 
 `cd /boot && sudo mkimage -C none -A arm -T script -d boot.cmd boot.scr`
 
-Disable MOTD:
+### Disable MOTD:
 
 `sudo chmod -x /etc/update-motd.d/*`
+
+### Passwordless Shutdown
+
+Open sudo file
+
+`sudo visudo`
+
+Add this line to end
+
+`flair ALL=(ALL) NOPASSWD: /usr/sbin/shutdown`
 
 
 
@@ -221,6 +238,15 @@ Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
 ### Install NodeJS, NPM, & PM2
 `nvm install 18 && npm install pm2 -g`
 
+### Add PM2 to .bashrc
+`cd /home/flair/ && nano .bashrc`
+
+Add this to the file:
+```
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+```
+
 ### Setup PM2 Processes
 `cd /home/flair/flairnode && pm2 start FlairNode.js && pm2 save && pm2 startup`
 (and copy/paste startup script to save startup)
@@ -257,7 +283,7 @@ WantedBy=multi-user.target
 ```
 (Be sure to change the serial number!)
 
-Start service: `systemctl start flairssh.service && systemctl enable flairssh.service`
+Start service: `sudo systemctl start flairssh.service && sudo systemctl enable flairssh.service`
 
 
 
