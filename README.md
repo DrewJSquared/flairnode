@@ -77,6 +77,7 @@ sudo apt install -y --no-install-recommends \
 
 ## 4. BASH PROFILE
 Setup bash profile script
+
 `cd /home/flair/ && sudo nano .bash_profile`
 
 Contents
@@ -89,6 +90,7 @@ fi
 
 ## 5. Xserver Config (window management)
 Open config file:
+
 `nano ~/.xinitrc`
 
 Contents:
@@ -137,6 +139,8 @@ chromium \
 
 
 ## 6. Boot Config
+Open file
+
 `sudo nano /boot/armbianEnv.txt`
 
 File contents:
@@ -153,9 +157,11 @@ extraargs=splash quiet vt.global_cursor_default=0 consoleblank=0
 ```
 
 Then recompile: 
+
 `cd /boot && sudo mkimage -C none -A arm -T script -d boot.cmd boot.scr`
 
-Disable MOTD:???????
+Disable MOTD:
+
 `sudo chmod -x /etc/update-motd.d/*`
 
 
