@@ -29,7 +29,10 @@ set to `flairnode`
 `nano /etc/hosts`
 set to `flairnode` where relvant
 
-- Switch to ssh from this point forward
+### Reboot
+Flip switch to MMC for reboot to work properly then reboot. 
+
+- Switch to ssh from this point forward for ease
 
 ## 2. GETTY TTY1 SERVICE
 
@@ -124,7 +127,7 @@ chromium \
         --no-first-run \
         --autoplay-policy=no-user-gesture-required \
         --start-fullscreen \
-        --kiosk file:///home/flair/usbvideo.html \
+        --kiosk file:///home/flair/flairnode/render.html \
         --window-size=1920,1080 \
         --window-position=0,0 \
         --window-background-color="#000000" \
@@ -153,32 +156,198 @@ Then recompile:
 `cd /boot && sudo mkimage -C none -A arm -T script -d boot.cmd boot.scr`
 
 Disable MOTD:???????
-`sudo systemctl disable armbian-motd`
+`sudo chmod -x /etc/update-motd.d/*`
 
 
 
 
 
-## How to Install From Scratch
+## somewhere in here...
+
+### Set Timezone
+`sudo ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime && sudo dpkg-reconfigure -f noninteractive tzdata`
+
+
+
+
+
+## x. FlairNode Source Code
+
+### Download & Unzip
 Download the GitHub repository as a zip file
-`curl -L -o attitudecontrol2a.zip "https://github.com/DrewJSquared/attitudecontrol2a/archive/refs/heads/main.zip"`
+
+`curl -L -o flairnode.zip "https://github.com/DrewJSquared/flairnode/archive/refs/heads/main.zip"`
 
 Unzip the downloaded file
-`unzip attitudecontrol2a.zip -d attitudecontrol2a_tmp`
+
+`unzip flairnode.zip -d flairnode_tmp`
 
 Move the contents to the attitudecontrol2a directory
-`rsync -av --remove-source-files attitudecontrol2a_tmp/attitudecontrol2a-main/ ./attitudecontrol2a`
+
+`rsync -av --remove-source-files flairnode_tmp/flairnode-main/ ./flairnode`
 
 Clean up temporary files
-`rm -rf attitudecontrol2a.zip attitudecontrol2a_tmp`
+
+`rm -rf flairnode.zip flairnode_tmp`
+
+
+### Setup Device ID
 
 Create id.json
+
 `nano id.json`
 
 Copy/Paste the following for id.json
+
 ```
 {
   "device_id":1,
-  "serialnumber":"AC-00200XX"
+  "serialnumber":"FN-00100XX"
 }
 ```
+
+
+
+## x. NVM, Node, & PM2 Setup
+
+### Install NVM
+`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash `
+Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
+
+### Install NodeJS, NPM, & PM2
+`nvm install 18 && npm install pm2 -g`
+
+### Setup PM2 Processes
+`cd /home/flair/flairnode && pm2 start FlairNode.js && pm2 save && pm2 startup`
+(and copy/paste startup script to save startup)
+
+
+
+
+
+
+
+## xx. Reverse Tunnel SSH
+Install autossh & test connection: `sudo apt install autossh && autossh -R flairnode-00100XX:22:localhost:22 serveo.net`
+(Be sure to change the serial number!)
+(and test connection and accept key for Serveo.net else it wont work!!!)
+
+Setup service file: `sudo nano /etc/systemd/system/attitudessh.service`
+
+Copy this into the new file: 
+```
+[Unit]
+Description=Attitude SSH
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=attitude
+ExecStart=autossh -R attitudecontrol-00200XX:22:localhost:22 serveo.net
+
+[Install]
+WantedBy=multi-user.target
+```
+(Be sure to change the serial number!)
+
+Start service: `systemctl start attitudessh.service && systemctl enable attitudessh.service`
+
+
+
+
+
+
+## USB Auto Mount Service
+Made my own auto usb mount service
+
+### Auto Mount
+
+Setup:
+
+`sudo nano /usr/local/bin/flair-usb-automount`
+
+
+File Contents:
+
+```
+#!/bin/bash
+
+echo "[flair-usb-automount] Watching for /dev/sda1 add/remove events..."
+
+MOUNT_DIR="/media/usb0"
+
+udevadm monitor --udev --subsystem-match=block | while read -r line; do
+  if echo "$line" | grep -q 'add' && echo "$line" | grep -q 'sda1'; then
+    echo "[flair-usb-automount] Detected /dev/sda1 add event!"
+
+    if mount | grep -q '/dev/sda1'; then
+      echo "[flair-usb-automount] /dev/sda1 is already mounted."
+    else
+      echo "[flair-usb-automount] Mounting /dev/sda1 to $MOUNT_DIR"
+      sudo mkdir -p "$MOUNT_DIR"
+      if sudo mount /dev/sda1 "$MOUNT_DIR"; then
+        echo "[flair-usb-automount] Successfully mounted to $MOUNT_DIR"
+      else
+        echo "[flair-usb-automount] Failed to mount /dev/sda1"
+      fi
+    fi
+  fi
+
+  if echo "$line" | grep -q 'remove' && echo "$line" | grep -q 'sda1'; then
+    echo "[flair-usb-automount] Detected /dev/sda1 removal event!"
+
+    if mount | grep -q '/dev/sda1'; then
+      echo "[flair-usb-automount] Unmounting /dev/sda1 from $MOUNT_DIR"
+      if sudo umount /dev/sda1; then
+        echo "[flair-usb-automount] Successfully unmounted."
+        sudo rmdir "$MOUNT_DIR" 2>/dev/null
+      else
+        echo "[flair-usb-automount] Failed to unmount /dev/sda1"
+      fi
+    else
+      echo "[flair-usb-automount] /dev/sda1 was not mounted."
+    fi
+  fi
+done
+```
+
+Make executable:
+
+`sudo chmod +x /usr/local/bin/flair-usb-automount`
+
+
+### Setup systemd service
+
+Command:
+
+`sudo nano /etc/systemd/system/flair-usb-automount.service`
+
+
+File Contents:
+
+```
+[Unit]
+Description=Flair USB Auto-Mount Service
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/flair-usb-automount
+Restart=always
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable:
+
+`sudo systemctl daemon-reload && sudo systemctl enable --now flair-usb-automount.service`
+
+
+
