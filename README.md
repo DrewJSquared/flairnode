@@ -162,16 +162,7 @@ Disable MOTD:???????
 
 
 
-## somewhere in here...
-
-### Set Timezone
-`sudo ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime && sudo dpkg-reconfigure -f noninteractive tzdata`
-
-
-
-
-
-## x. FlairNode Source Code
+## 7. FlairNode Source Code
 
 ### Download & Unzip
 Download the GitHub repository as a zip file
@@ -207,8 +198,15 @@ Copy/Paste the following for id.json
 ```
 
 
+### Set Timezone
+`sudo ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime && sudo dpkg-reconfigure -f noninteractive tzdata`
 
-## x. NVM, Node, & PM2 Setup
+
+
+
+
+
+## 8. NVM, Node, & PM2 Setup
 
 ### Install NVM
 `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash `
@@ -227,7 +225,7 @@ Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
 
 
 
-## xx. Reverse Tunnel SSH
+## 9. Reverse Tunnel SSH
 Install autossh & test connection: `sudo apt install autossh && autossh -R flairnode-00100XX:22:localhost:22 serveo.net`
 (Be sure to change the serial number!)
 (and test connection and accept key for Serveo.net else it wont work!!!)
@@ -260,7 +258,7 @@ Start service: `systemctl start attitudessh.service && systemctl enable attitude
 
 
 
-## USB Auto Mount Service
+## 10. USB Auto Mount Service
 Made my own auto usb mount service
 
 ### Auto Mount
