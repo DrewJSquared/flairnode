@@ -83,13 +83,34 @@ Setup bash profile script
 
 Contents
 ```
+# Source bashrc if it exists
 if [ -f ~/.bashrc ]; then
   . ~/.bashrc
 fi
 
+# Only run GUI setup on primary TTY without DISPLAY already set
 if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-        echo "Launching X server via .bash_profile..."
-        startx > /dev/null 2>&1
+  clear
+
+  # Print system info
+  echo "=========================="
+  echo " Welcome to Flair Node"
+  echo "=========================="
+  echo "Hostname: $(hostname)"
+  echo "IP Address: $(hostname -I)"
+  echo "Time: $(date)"
+  echo ""
+
+  # Countdown before launching X
+  for i in $(seq 10 -1 1); do
+          printf "\rStarting in $i seconds... "
+          sleep 1
+  done
+  echo ""
+
+  # Launch X and log all output
+  echo "Launching X server via .bash_profile..."
+  startx 2>&1 | tee ~/xserver.log
 fi
 ```
 

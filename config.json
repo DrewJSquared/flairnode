@@ -1,5 +1,5 @@
 {
-  "message": "Server Error",
+  "message": "Undefined property: stdClass::$flair_node_id",
   "node_id": 1,
   "serial_number": "FN-0000001",
   "logLevel": "none",
@@ -41,5 +41,288 @@
       ]
     },
     "finalized": false
-  }
+  },
+  "exception": "ErrorException",
+  "file": "/Users/drewshipps/Laravel/flairled/app/Http/Controllers/FlairNodeController.php",
+  "line": 285,
+  "trace": [
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php",
+      "line": 256,
+      "function": "handleError",
+      "class": "Illuminate\\Foundation\\Bootstrap\\HandleExceptions",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/app/Http/Controllers/FlairNodeController.php",
+      "line": 285,
+      "function": "Illuminate\\Foundation\\Bootstrap\\{closure}",
+      "class": "Illuminate\\Foundation\\Bootstrap\\HandleExceptions",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php",
+      "line": 46,
+      "function": "sync",
+      "class": "App\\Http\\Controllers\\FlairNodeController",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+      "line": 265,
+      "function": "dispatch",
+      "class": "Illuminate\\Routing\\ControllerDispatcher",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+      "line": 211,
+      "function": "runController",
+      "class": "Illuminate\\Routing\\Route",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+      "line": 808,
+      "function": "run",
+      "class": "Illuminate\\Routing\\Route",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 169,
+      "function": "Illuminate\\Routing\\{closure}",
+      "class": "Illuminate\\Routing\\Router",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+      "line": 50,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Routing\\Middleware\\SubstituteBindings",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 126,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+      "line": 807,
+      "function": "then",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+      "line": 786,
+      "function": "runRouteWithinStack",
+      "class": "Illuminate\\Routing\\Router",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+      "line": 750,
+      "function": "runRoute",
+      "class": "Illuminate\\Routing\\Router",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+      "line": 739,
+      "function": "dispatchToRoute",
+      "class": "Illuminate\\Routing\\Router",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+      "line": 200,
+      "function": "dispatch",
+      "class": "Illuminate\\Routing\\Router",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 169,
+      "function": "Illuminate\\Foundation\\Http\\{closure}",
+      "class": "Illuminate\\Foundation\\Http\\Kernel",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+      "line": 21,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+      "line": 31,
+      "function": "handle",
+      "class": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+      "line": 21,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+      "line": 51,
+      "function": "handle",
+      "class": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+      "line": 27,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Http\\Middleware\\ValidatePostSize",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+      "line": 109,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+      "line": 61,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Http\\Middleware\\HandleCors",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+      "line": 58,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Http\\Middleware\\TrustProxies",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+      "line": 22,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php",
+      "line": 26,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 208,
+      "function": "handle",
+      "class": "Illuminate\\Http\\Middleware\\ValidatePathEncoding",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+      "line": 126,
+      "function": "Illuminate\\Pipeline\\{closure}",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+      "line": 175,
+      "function": "then",
+      "class": "Illuminate\\Pipeline\\Pipeline",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+      "line": 144,
+      "function": "sendRequestThroughRouter",
+      "class": "Illuminate\\Foundation\\Http\\Kernel",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/vendor/laravel/framework/src/Illuminate/Foundation/Application.php",
+      "line": 1219,
+      "function": "handle",
+      "class": "Illuminate\\Foundation\\Http\\Kernel",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/Laravel/flairled/public/index.php",
+      "line": 20,
+      "function": "handleRequest",
+      "class": "Illuminate\\Foundation\\Application",
+      "type": "->"
+    },
+    {
+      "file": "/Users/drewshipps/.composer/vendor/laravel/valet/server.php",
+      "line": 110,
+      "function": "require"
+    }
+  ]
 }
