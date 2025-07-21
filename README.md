@@ -69,7 +69,8 @@ sudo apt install -y --no-install-recommends \
   openbox \
   unclutter \
   xdotool \
-  unzip
+  unzip \
+  python3-xdg
 ```
 
 ### Install Chrome Directly
@@ -111,7 +112,7 @@ if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
 
   # Launch X and log all output
   echo "Launching X server via .bash_profile..."
-  startx 2>&1 | tee ~/startx.log
+  startx 2>&1 | tee ~/startx_bash_profile.log
 fi
 ```
 
@@ -122,7 +123,7 @@ Open config file:
 
 Contents:
 ```
-#!/bin/sh
+#!/bin/bash
 
 # Start the window manager first
 openbox-session &
@@ -142,6 +143,7 @@ xdotool mousemove 10 10
 # Hide cursor after 5 seconds of inactivity
 unclutter -idle 5 &
 
+# Wait for everything else then start chromium
 sleep 2
 
 # Launch Chromium in kiosk mode — this stays in foreground
@@ -182,15 +184,15 @@ Open file
 
 File contents:
 ```
-verbosity=0
-bootlogo=true
+verbosity=1
+bootlogo=false
 disp_mode=1920x1080p60
 console=serial
 overlay_prefix=meson
 rootdev=UUID=f5fb71ca-255e-4afd-b19f-047a7ac3bfa2
 rootfstype=ext4
+extraargs=hdmi_force_hotplug=1
 usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
-extraargs=splash quiet vt.global_cursor_default=0 consoleblank=0
 ```
 
 Then recompile: 
@@ -211,7 +213,17 @@ Add this line to end
 
 `flair ALL=(ALL) NOPASSWD: /usr/sbin/shutdown`
 
+### THE MAGIC THAT FIXES THE BOOT PROBLEM (THANK HEAVENS)
 
+Whatever this is gets rid of GPU card 1
+
+`echo "blacklist simpledrm" | sudo tee /etc/modprobe.d/blacklist-simpledrm.conf`
+
+And then this recompiles something
+
+`sudo update-initramfs -u`
+
+Then you gotta reboot twin.
 
 
 
