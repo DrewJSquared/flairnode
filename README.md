@@ -90,7 +90,10 @@ fi
 
 # Only run GUI setup on primary TTY without DISPLAY already set
 if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+  # clear console
   clear
+  # hide cursor
+  tput civis
 
   # Print system info
   echo "======================="
@@ -108,7 +111,7 @@ if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
 
   # Launch X and log all output
   echo "Launching X server via .bash_profile..."
-  startx 2>&1 | tee ~/xserver.log
+  startx 2>&1 | tee ~/startx.log
 fi
 ```
 
@@ -125,7 +128,7 @@ Contents:
 openbox-session &
 
 # Wait briefly to ensure X and Openbox are ready
-sleep 0.5
+sleep 1
 
 # Disable screen blanking and power saving
 xset s off           # Disable screen saver
@@ -133,11 +136,13 @@ xset s noblank       # Prevent screen blanking
 xset -dpms           # Disable energy-saving features
 xset dpms 0 0 0      # Just in case, set timers to 0
 
-# Move mouse to bottom-right corner (1920x1080 screen)
-xdotool mousemove 1919 1079
+# Move mouse to top left corner to see it during boot
+xdotool mousemove 10 10
 
-# Hide cursor after 1 second of inactivity
-unclutter -idle 1 &
+# Hide cursor after 5 seconds of inactivity
+unclutter -idle 5 &
+
+sleep 2
 
 # Launch Chromium in kiosk mode — this stays in foreground
 chromium \
@@ -157,8 +162,13 @@ chromium \
         --window-size=1920,1080 \
         --window-position=0,0 \
         --window-background-color="#000000" \
-  --force-device-scale-factor=1 \
+        --force-device-scale-factor=1 \
         --user-data-dir=/home/flair/.flair-profile
+        --disable-gpu \
+        --disable-software-rasterizer \
+        --disable-gpu-compositing \
+        --disable-accelerated-2d-canvas \
+        --no-service-autorun
 ```
 
 
