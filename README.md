@@ -93,12 +93,11 @@ if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
   clear
 
   # Print system info
-  echo "=========================="
+  echo "======================="
   echo " Welcome to Flair Node"
-  echo "=========================="
-  echo "Hostname: $(hostname)"
-  echo "IP Address: $(hostname -I)"
-  echo "Time: $(date)"
+  echo "======================="
+  echo "IP: $(hostname -I)"
+  echo "$(date)"
 
   # Countdown before launching X
   for i in $(seq 10 -1 1); do
