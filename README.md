@@ -99,7 +99,6 @@ if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
   echo "Hostname: $(hostname)"
   echo "IP Address: $(hostname -I)"
   echo "Time: $(date)"
-  echo ""
 
   # Countdown before launching X
   for i in $(seq 10 -1 1); do
