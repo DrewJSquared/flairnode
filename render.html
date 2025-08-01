@@ -54,6 +54,9 @@
 	<!-- wall type zones layout -->
 	<div id="wallTypeZonesLayout" style="position: relative; width: 100%; height: 100%;"></div>
 
+	<!-- rendered videos layout -->
+	<div id="renderedVideosLayout" style="position: relative; width: 100%; height: 100%;"></div>
+
 
 	<script>
 		console.log(`---------------------------
@@ -202,36 +205,49 @@ System initializing...
 					hideWallTypesLayout();
 					hideSerialNumberScreen();
 					showIdentifyScreen(true, data?.serial_number);
+					hideAllRenderedVideoFiles();
 					break;
 
 				case 'identify_not_this_node':
 					hideWallTypesLayout();
 					hideSerialNumberScreen();
 					showIdentifyScreen(false, data?.serial_number);
+					hideAllRenderedVideoFiles();
 					break;
 
 				case 'show_serial_number':
 					hideIdentifyScreen();
 					hideWallTypesLayout();
 					showSerialNumberScreen(data?.serial_number);
+					hideAllRenderedVideoFiles();
 					break;
 
 				case 'disable_identify_mode':
 					hideIdentifyScreen();
 					hideSerialNumberScreen();
 					hideWallTypesLayout();
+					hideAllRenderedVideoFiles();
 					break;
 
 				case 'show_wall_type_zones_layout':
 					hideIdentifyScreen();
 					hideSerialNumberScreen();
 					showWallTypeZonesLayout(data);
+					hideAllRenderedVideoFiles();
 					break;
 
 				case 'show_wall_type_zones_layout_with_time':
 					hideIdentifyScreen();
 					hideSerialNumberScreen();
 					showWallTypeZonesLayoutWithTime(data);
+					hideAllRenderedVideoFiles();
+					break;
+
+				case 'render_video_file':
+					hideIdentifyScreen();
+					hideSerialNumberScreen();
+					hideWallTypesLayout();
+					renderVideoFile(data);
 					break;
 
 
@@ -474,6 +490,64 @@ System initializing...
 				container.appendChild(zoneDiv);
 			});
 		}
+
+
+
+
+
+
+
+
+
+		// ==== RENDER VIDEO FILES ======
+		function hideAllRenderedVideoFiles() {
+			const container = document.getElementById('renderedVideosLayout');
+			container.innerHTML = '';
+		}
+
+
+		function renderVideoFile(data) {
+			const layout = document.getElementById('renderedVideosLayout');
+
+			// Construct full file path by replacing "render.html" in current location
+			const basePath = window.location.href.replace(/render\.html$/, '');
+			const fullPath = basePath + data.file.replace(/^\//, '');
+
+			console.log('rendering at ' + fullPath)
+
+			let element;
+
+			if (data.type === 'video') {
+				element = document.createElement('video');
+				element.src = fullPath;
+				element.autoplay = true;
+				element.loop = true;
+				element.muted = true;
+				element.playsInline = true;
+			} else if (data.type === 'image') {
+				element = document.createElement('img');
+				element.src = fullPath;
+			} else {
+				console.warn('Unknown type:', data.type);
+				return;
+			}
+
+			element.style.position = 'absolute';
+			element.style.left = data.x + 'px';
+			element.style.top = data.y + 'px';
+			element.style.width = data.width + 'px';
+			element.style.height = data.height + 'px';
+			element.style.objectFit = 'cover';
+
+			layout.appendChild(element);
+		}
+
+
+
+
+
+
+
 
 
 

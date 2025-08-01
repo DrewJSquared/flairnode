@@ -17,10 +17,28 @@ import idManager from './IdManager.mjs';
 import Logger from './Logger.mjs';
 const logger = new Logger('PlaybackController');
 
+import fs from 'fs';
+import path from 'path';
+import axios from 'axios';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 
 // variables
 const INTERVAL_MS = 1000;  // how often to attempt processPlayback
+
+const USE_LOCALHOST = false;  // for development only
+const LAPTOP_MODE = (process.platform === 'darwin');
+
+const CONTENT_DOWNLOAD_URL = (USE_LOCALHOST && LAPTOP_MODE)
+	? 'http://flairled.test/storage/scene_renders/'
+	: 'https://flairled.com/storage/scene_renders/';
+
+const OUTPUT_DIR = path.join(__dirname, 'content');
 
 
 
@@ -34,6 +52,8 @@ class PlaybackController {
 		this.lastRunTime = 0;
 		this.isRunning = false;
 		this.startTime = Date.now();
+
+		this.didWeRenderThisScene = false;
 	}
 
 
@@ -96,23 +116,87 @@ class PlaybackController {
 					return;
 				}
 
-				// get zones array from wallType.canvas.zones or fallback
-				const zones = wallType.canvas?.zones ?? [];
+				const scenes = configManager.getScenes();
+				const notes = configManager.getNotes();
+				const content = configManager.getContent();
+				const sceneMatch = notes?.match(/^playscene=(\d+)$/);
+				const sceneId = sceneMatch ? parseInt(sceneMatch[1], 10) : null;
 
-				// send layout to frontend
-				// DEFAULT VERSION NO TIME DATA
-				// RenderSocketClient.send('show_wall_type_zones_layout', { zones });
+				const filesToRender = [];
 
-				const currentTime = new Date().toLocaleTimeString();
-				const uptime = this.getUptimeString();
+				if (!this.didWeRenderThisScene) {
+					this.downloadSceneElements(scenes, content);
+				}
 
-				const enhancedZones = zones.map(zone => ({
-					...zone,
-					time_of_day: currentTime,
-					uptime: uptime,
-				}));
+				// let didWeRenderThisScene = false;
 
-				RenderSocketClient.send('show_wall_type_zones_layout_with_time', { zones: enhancedZones });
+				if (sceneId !== null) {
+					const scene = scenes.find(s => s.id === sceneId);
+					// console.log('hey so did we render it?' + this.didWeRenderThisScene)
+
+					if (scene && !this.didWeRenderThisScene) {
+						// console.log(scene);
+						// console.log(content);
+
+						for (const element of scene.elements) {
+
+							console.log('element');
+							console.log(element);
+
+							const contentItem = content.find(c => c.id === element.content_id);
+
+							console.log('contentItem');
+							console.log(contentItem);
+
+							if (!contentItem) continue;
+
+							const extension = (contentItem.type == 'image') ? 'jpg' : 'mp4';
+
+							const fileToRenderObject = {
+								file: `/content/${scene.id}-${element.layer}-${scene.render_version}.${extension}`,
+								x: element.x,
+								y: element.y,
+								width: element.width,
+								height: element.height,
+								type: contentItem.type,
+							};
+
+							RenderSocketClient.send('render_video_file', fileToRenderObject);
+
+							console.log('sending render object');
+							console.log(fileToRenderObject);
+						}
+
+						this.didWeRenderThisScene = true;
+						// console.log('scene is rendered yay')
+					}
+
+
+
+				} else {
+					// if no scene assigned show zones
+
+
+
+					// get zones array from wallType.canvas.zones or fallback
+					const zones = wallType.canvas?.zones ?? [];
+
+					// send layout to frontend
+					// DEFAULT VERSION NO TIME DATA
+					// RenderSocketClient.send('show_wall_type_zones_layout', { zones });
+
+					const currentTime = new Date().toLocaleTimeString();
+					const uptime = this.getUptimeString();
+
+					const enhancedZones = zones.map(zone => ({
+						...zone,
+						time_of_day: currentTime,
+						uptime: uptime,
+					}));
+
+					RenderSocketClient.send('show_wall_type_zones_layout_with_time', { zones: enhancedZones });
+				}
+ 
 
 
 				// TODO: Handle Scene playback logic when role is assigned
@@ -147,6 +231,42 @@ class PlaybackController {
 		} finally {
 			// mark done
 			this.isRunning = false;
+		}
+	}
+
+
+	async downloadSceneElements(scenes, contentList) {
+		if (!fs.existsSync(OUTPUT_DIR)) {
+			fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+		}
+
+		for (const scene of scenes) {
+			for (const element of scene.elements) {
+				const contentItem = contentList.find(c => c.id === element.content_id);
+				if (!contentItem) continue;
+
+				const ext = contentItem.type === 'video' ? 'mp4' : 'jpg';
+				const filename = `${scene.id}-${element.layer}-${scene.render_version}.${ext}`;
+				const downloadUrl = `${CONTENT_DOWNLOAD_URL}${scene.id}/${filename}`;
+				const filePath = path.join(OUTPUT_DIR, filename);
+
+				try {
+					console.log(`Downloading: ${downloadUrl}`);
+					const response = await axios.get(downloadUrl, { responseType: 'stream' });
+
+					const writer = fs.createWriteStream(filePath);
+					response.data.pipe(writer);
+
+					await new Promise((resolve, reject) => {
+						writer.on('finish', resolve);
+						writer.on('error', reject);
+					});
+
+					console.log(`Saved: ${filePath}`);
+				} catch (err) {
+					console.error(`Failed to download ${filename}:`, err.message);
+				}
+			}
 		}
 	}
 

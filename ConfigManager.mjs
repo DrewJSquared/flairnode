@@ -201,6 +201,21 @@ class ConfigManager {
         return this.config.wall_type ?? null;
 	}
 
+	// scenes
+	getScenes() {
+        return this.config.scenes ?? [];
+	}
+
+	// content
+	getContent() {
+        return this.config.content ?? [];
+	}
+
+	// TEMP - NOTES
+	getNotes() {
+        return this.config.notes ?? [];
+	}
+
 
 	// timezone
 	// getDeviceTimezone() {
