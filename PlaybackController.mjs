@@ -54,6 +54,7 @@ class PlaybackController {
 		this.startTime = Date.now();
 
 		this.didWeRenderThisScene = false;
+		this.lastRenderVersion = 0;
 	}
 
 
@@ -124,9 +125,9 @@ class PlaybackController {
 
 				const filesToRender = [];
 
-				if (!this.didWeRenderThisScene) {
-					this.downloadSceneElements(scenes, content);
-				}
+				// if (!this.didWeRenderThisScene) {
+				// 	this.downloadSceneElements(scenes, content);
+				// }
 
 				// let didWeRenderThisScene = false;
 
@@ -134,41 +135,60 @@ class PlaybackController {
 					const scene = scenes.find(s => s.id === sceneId);
 					// console.log('hey so did we render it?' + this.didWeRenderThisScene)
 
-					if (scene && !this.didWeRenderThisScene) {
-						// console.log(scene);
-						// console.log(content);
+					if (scene) {
 
-						for (const element of scene.elements) {
+						console.log('scene.render_version: ' + scene.render_version);
+						console.log('this.lastRenderVersion: ' + this.lastRenderVersion);
 
-							console.log('element');
-							console.log(element);
+						if (scene.render_version != this.lastRenderVersion) {
+							this.downloadSceneElements(scenes, content);
+							this.lastRenderVersion = scene.render_version;
 
-							const contentItem = content.find(c => c.id === element.content_id);
+							setTimeout(function () {
+								console.log('NOW telling chrome to show videos');
 
-							console.log('contentItem');
-							console.log(contentItem);
+								// console.log(scene);
+								// console.log(content);
 
-							if (!contentItem) continue;
+								// clear screen essentially
+								RenderSocketClient.send('hide_rendered_video_files', {});
 
-							const extension = (contentItem.type == 'image') ? 'jpg' : 'mp4';
+								if (scene.elements?.length > 0) {
+									for (const element of scene.elements) {
 
-							const fileToRenderObject = {
-								file: `/content/${scene.id}-${element.layer}-${scene.render_version}.${extension}`,
-								x: element.x,
-								y: element.y,
-								width: element.width,
-								height: element.height,
-								type: contentItem.type,
-							};
+										console.log('element');
+										console.log(element);
 
-							RenderSocketClient.send('render_video_file', fileToRenderObject);
+										const contentItem = content.find(c => c.id === element.content_id);
 
-							console.log('sending render object');
-							console.log(fileToRenderObject);
+										console.log('contentItem');
+										console.log(contentItem);
+
+										if (!contentItem) continue;
+
+										const extension = (contentItem.type == 'image') ? 'jpg' : 'mp4';
+
+										const fileToRenderObject = {
+											file: `/content/${scene.id}-${element.layer}-${scene.render_version}.${extension}`,
+											x: element.x,
+											y: element.y,
+											width: element.width,
+											height: element.height,
+											type: contentItem.type,
+										};
+
+										RenderSocketClient.send('render_video_file', fileToRenderObject);
+
+										console.log('sending render object');
+										console.log(fileToRenderObject);
+									}
+
+									this.didWeRenderThisScene = true;
+									// console.log('scene is rendered yay')
+								}
+
+							}, 5000);
 						}
-
-						this.didWeRenderThisScene = true;
-						// console.log('scene is rendered yay')
 					}
 
 
@@ -241,30 +261,32 @@ class PlaybackController {
 		}
 
 		for (const scene of scenes) {
-			for (const element of scene.elements) {
-				const contentItem = contentList.find(c => c.id === element.content_id);
-				if (!contentItem) continue;
+			if (scene.elements?.length > 0) {
+				for (const element of scene.elements) {
+					const contentItem = contentList.find(c => c.id === element.content_id);
+					if (!contentItem) continue;
 
-				const ext = contentItem.type === 'video' ? 'mp4' : 'jpg';
-				const filename = `${scene.id}-${element.layer}-${scene.render_version}.${ext}`;
-				const downloadUrl = `${CONTENT_DOWNLOAD_URL}${scene.id}/${filename}`;
-				const filePath = path.join(OUTPUT_DIR, filename);
+					const ext = contentItem.type === 'video' ? 'mp4' : 'jpg';
+					const filename = `${scene.id}-${element.layer}-${scene.render_version}.${ext}`;
+					const downloadUrl = `${CONTENT_DOWNLOAD_URL}${scene.id}/${filename}`;
+					const filePath = path.join(OUTPUT_DIR, filename);
 
-				try {
-					console.log(`Downloading: ${downloadUrl}`);
-					const response = await axios.get(downloadUrl, { responseType: 'stream' });
+					try {
+						console.log(`Downloading: ${downloadUrl}`);
+						const response = await axios.get(downloadUrl, { responseType: 'stream' });
 
-					const writer = fs.createWriteStream(filePath);
-					response.data.pipe(writer);
+						const writer = fs.createWriteStream(filePath);
+						response.data.pipe(writer);
 
-					await new Promise((resolve, reject) => {
-						writer.on('finish', resolve);
-						writer.on('error', reject);
-					});
+						await new Promise((resolve, reject) => {
+							writer.on('finish', resolve);
+							writer.on('error', reject);
+						});
 
-					console.log(`Saved: ${filePath}`);
-				} catch (err) {
-					console.error(`Failed to download ${filename}:`, err.message);
+						console.log(`Saved: ${filePath}`);
+					} catch (err) {
+						console.error(`Failed to download ${filename}:`, err.message);
+					}
 				}
 			}
 		}

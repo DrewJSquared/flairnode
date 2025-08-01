@@ -250,6 +250,10 @@ System initializing...
 					renderVideoFile(data);
 					break;
 
+				case 'hide_rendered_video_files':
+					hideAllRenderedVideoFiles();
+					break;
+
 
 				default:
 					console.warn(`Unknown command: ${command}`);
