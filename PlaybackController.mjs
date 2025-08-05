@@ -257,6 +257,8 @@ class PlaybackController {
 
 	async downloadSceneElements(scenes, contentList) {
 		logger.info(`Downloading scene elements... (content list is ${contentList?.length} items long)`);
+		console.log(`Downloading scene elements... (content list is ${contentList?.length} items long)`);
+
 		var downloadCounter = 0;
 
 		if (!fs.existsSync(OUTPUT_DIR)) {
@@ -296,6 +298,7 @@ class PlaybackController {
 		}
 
 		logger.info(`Finished downloading ${downloadCounter} items!`);
+		console.log(`Finished downloading ${downloadCounter} items!`);
 	}
 
 
