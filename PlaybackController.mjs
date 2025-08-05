@@ -287,7 +287,7 @@ class PlaybackController {
 						});
 
 						console.log(`Saved: ${filePath}`);
-						downloadCounter++:
+						downloadCounter++;
 					} catch (err) {
 						console.error(`Failed to download ${filename}:`, err.message);
 					}
