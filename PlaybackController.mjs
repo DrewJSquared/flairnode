@@ -256,6 +256,9 @@ class PlaybackController {
 
 
 	async downloadSceneElements(scenes, contentList) {
+		logger.info(`Downloading scene elements... (content list is ${contentList?.length} items long)`);
+		var downloadCounter = 0;
+
 		if (!fs.existsSync(OUTPUT_DIR)) {
 			fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 		}
@@ -284,12 +287,15 @@ class PlaybackController {
 						});
 
 						console.log(`Saved: ${filePath}`);
+						downloadCounter++:
 					} catch (err) {
 						console.error(`Failed to download ${filename}:`, err.message);
 					}
 				}
 			}
 		}
+
+		logger.info(`Finished downloading ${downloadCounter} items!`);
 	}
 
 
