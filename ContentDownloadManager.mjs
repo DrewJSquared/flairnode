@@ -181,8 +181,13 @@ class ContentDownloadManager {
 
 					writer.on('finish', () => {
 						clearTimeout(timeout);
-						logger.info(`Downloaded: ${item.filename}`);
-						console.log(`Downloaded: ${item.filename}`);
+
+        				if (configManager.checkLogLevel('interval')) {
+							logger.info(`Downloaded: ${item.filename}`);
+						}
+
+						// console.log(`Downloaded: ${item.filename}`);
+							
 						resolve();
 					});
 

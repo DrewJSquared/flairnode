@@ -106,10 +106,15 @@ class RenderSocketClient {
 		// try to send
 		try {
 			this.clientSocket.send(JSON.stringify(payload));
-			logger.info(`Sent command to render client: ${command}`);
+
+            if (configManager.checkLogLevel('detail')) {
+				logger.info(`Sent command to render client: ${command}`);
+			}
+
 			return true;
 		} catch (err) {
 			logger.error(`Failed to send command "${command}" to client: ${err.message}`);
+			
 			return false;
 		}
 	}
