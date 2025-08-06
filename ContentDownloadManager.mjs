@@ -71,7 +71,11 @@ class ContentDownloadManager {
 			if (this.scanInProgress) return;
 			this.scanInProgress = true;
 
-			console.log(`Scan in progress... checking to see what content should be downloaded...`);
+            if (configManager.checkLogLevel('interval')) {
+                logger.info(`Checking for new content to be downloaded at ${ new Date().toLocaleTimeString() }`);
+            }
+
+			// console.log(`Checking for new content to be downloaded at ${ new Date().toLocaleTimeString() }`);
 
 			const scenes = configManager.getScenes();
 			const contentList = configManager.getContent();
@@ -229,9 +233,13 @@ class ContentDownloadManager {
 			}
 
 			if (deletedFiles.length > 0) {
-				logger.info(`Purged ${deletedFiles.length} unused files: ${deletedFiles.join(', ')}`);
+            	if (configManager.checkLogLevel('interval')) {
+					logger.info(`Purged ${deletedFiles.length} unused files: ${deletedFiles.join(', ')}`);
+				}
 			} else {
-				logger.info('No unused content to purge.');
+            	if (configManager.checkLogLevel('interval')) {
+					logger.info('No unused content to purge.');
+				}
 			}
 		} catch (err) {
 			logger.error(`Error during purge: ${err.message}`);
