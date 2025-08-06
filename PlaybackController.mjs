@@ -137,11 +137,10 @@ class PlaybackController {
 
 					if (scene) {
 
-						console.log('scene.render_version: ' + scene.render_version);
-						console.log('this.lastRenderVersion: ' + this.lastRenderVersion);
+						console.log(`scene.render_version: ${scene.render_version}  |  this.lastRenderVersion: ${this.lastRenderVersion}`);
 
 						if (scene.render_version != this.lastRenderVersion) {
-							this.downloadSceneElements(scenes, content);
+							// this.downloadSceneElements(scenes, content);
 							this.lastRenderVersion = scene.render_version;
 
 							setTimeout(function () {
@@ -156,13 +155,13 @@ class PlaybackController {
 								if (scene.elements?.length > 0) {
 									for (const element of scene.elements) {
 
-										console.log('element');
-										console.log(element);
+										// console.log('element');
+										// console.log(element);
 
 										const contentItem = content.find(c => c.id === element.content_id);
 
-										console.log('contentItem');
-										console.log(contentItem);
+										// console.log('contentItem');
+										// console.log(contentItem);
 
 										if (!contentItem) continue;
 
@@ -179,8 +178,8 @@ class PlaybackController {
 
 										RenderSocketClient.send('render_video_file', fileToRenderObject);
 
-										console.log('sending render object');
-										console.log(fileToRenderObject);
+										// console.log('sending render object');
+										// console.log(fileToRenderObject);
 									}
 
 									this.didWeRenderThisScene = true;

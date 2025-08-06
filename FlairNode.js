@@ -21,6 +21,7 @@ import udpManager from './UDPManager.mjs';
 
 import renderSocketClient from './RenderSocketClient.mjs';
 import playbackController from './PlaybackController.mjs';
+import contentDownloadManager from './ContentDownloadManager.mjs';
 
 
 
@@ -73,6 +74,12 @@ setTimeout(() => {
 setTimeout(() => {
 	udpManager.init();
 }, 80);
+
+
+// initialize content download manager
+setTimeout(() => {
+	contentDownloadManager.init();
+}, 90);
 
 
 // initialization sequence complete!
