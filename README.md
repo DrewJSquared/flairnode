@@ -19,15 +19,12 @@ real name: Flair
 
 detected location
 
-don't generate locales (7)
+don't generate locales (6)
 
 ### Hostname:
-`sudo nano /etc/hostname`
-set to `flairnode`
+`sudo armbian-config`
 
-### Hosts:
-`sudo nano /etc/hosts`
-set to `flairnode` where relvant
+Then go to **localization** > **hostname** then rename to `flairnode`
 
 - Switch to ssh from this point forward for ease
 
