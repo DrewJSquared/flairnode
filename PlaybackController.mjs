@@ -133,7 +133,7 @@ class PlaybackController {
 
 				if (sceneId !== null) {
 					const scene = scenes.find(s => s.id === sceneId);
-					// console.log('hey so did we render it?' + this.didWeRenderThisScene)
+					console.log('hey so did we render it?' + this.didWeRenderThisScene)
 
 					if (scene) {
 
@@ -143,7 +143,7 @@ class PlaybackController {
 							// this.downloadSceneElements(scenes, content);
 							this.lastRenderVersion = scene.render_version;
 
-							setTimeout(function () {
+							// setTimeout(function () {
 								console.log('NOW telling chrome to show videos');
 
 								// console.log(scene);
@@ -186,7 +186,7 @@ class PlaybackController {
 									// console.log('scene is rendered yay')
 								}
 
-							}, 5000);
+							// }, 10000);
 						}
 					}
 
