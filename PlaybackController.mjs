@@ -140,7 +140,7 @@ class PlaybackController {
 						console.log(`scene.render_version: ${scene.render_version}  |  this.lastRenderVersion: ${this.lastRenderVersion}`);
 
 						if (scene.render_version != this.lastRenderVersion) {
-							this.downloadSceneElements(scenes, content);
+							// this.downloadSceneElements(scenes, content);
 							this.lastRenderVersion = scene.render_version;
 
 							setTimeout(function () {
