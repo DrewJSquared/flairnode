@@ -14,6 +14,8 @@ import eventHub from './EventHub.mjs';
 import Logger from './Logger.mjs';
 const logger = new Logger('RenderSocketClient');
 
+import configManager from './ConfigManager.mjs';
+
 import { WebSocketServer } from 'ws';
 
 
@@ -114,7 +116,7 @@ class RenderSocketClient {
 			return true;
 		} catch (err) {
 			logger.error(`Failed to send command "${command}" to client: ${err.message}`);
-			
+
 			return false;
 		}
 	}
