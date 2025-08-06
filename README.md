@@ -68,7 +68,9 @@ sudo apt install -y --no-install-recommends \
 ```
 
 ### Install Chrome Directly
-`sudo apt install -y -t noble chromium`
+`sudo apt install -y chromium-browser`
+
+this is the version direct from raspi which should fix the casting issue
 
 
 ## 4. BASH PROFILE
@@ -164,7 +166,8 @@ chromium \
         --disable-software-rasterizer \
         --disable-gpu-compositing \
         --disable-accelerated-2d-canvas \
-        --no-service-autorun
+        --no-service-autorun \
+        --disable-features=MediaRouter
 ```
 
 
