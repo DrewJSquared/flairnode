@@ -71,6 +71,8 @@ class ContentDownloadManager {
 			if (this.scanInProgress) return;
 			this.scanInProgress = true;
 
+			console.log(`Scan in progress... checking to see what content should be downloaded...`);
+
 			const scenes = configManager.getScenes();
 			const contentList = configManager.getContent();
 
