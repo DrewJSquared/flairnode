@@ -75,6 +75,10 @@ class PlaybackController {
 		}, this.interval);
 
 
+		// handle incoming sense data
+		eventHub.on('receivedUDP', this.handleNewSenseData);
+
+
 		// log initialization
 		logger.info(`Initializing Playback Controller...`);
 	}
@@ -293,51 +297,54 @@ class PlaybackController {
 	}
 
 
-	async downloadSceneElements(scenes, contentList) {
-		logger.info(`Downloading scene elements... (content list is ${contentList?.length} items long)`);
-		console.log(`Downloading scene elements... (content list is ${contentList?.length} items long)`);
 
-		var downloadCounter = 0;
-
-		if (!fs.existsSync(OUTPUT_DIR)) {
-			fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-		}
-
-		for (const scene of scenes) {
-			if (scene.elements?.length > 0) {
-				for (const element of scene.elements) {
-					const contentItem = contentList.find(c => c.id === element.content_id);
-					if (!contentItem) continue;
-
-					const ext = contentItem.type === 'video' ? 'mp4' : 'jpg';
-					const filename = `${scene.id}-${element.layer}-${scene.render_version}.${ext}`;
-					const downloadUrl = `${CONTENT_DOWNLOAD_URL}${scene.id}/${filename}`;
-					const filePath = path.join(OUTPUT_DIR, filename);
-
-					try {
-						console.log(`Downloading: ${downloadUrl}`);
-						const response = await axios.get(downloadUrl, { responseType: 'stream' });
-
-						const writer = fs.createWriteStream(filePath);
-						response.data.pipe(writer);
-
-						await new Promise((resolve, reject) => {
-							writer.on('finish', resolve);
-							writer.on('error', reject);
-						});
-
-						console.log(`Saved: ${filePath}`);
-						downloadCounter++;
-					} catch (err) {
-						console.error(`Failed to download ${filename}:`, err.message);
-					}
+	// handleNewSenseData - function to handle the data packet received from the sense
+	handleNewSenseData(object) {
+		// wrap the processing logic in a try catch in case of errors
+		try {
+			// skip packets that are not from TYPE 1 devices (i.e. not from Attitude Sense units)
+			if (object?.TYPE !== 1) {
+				if (configManager.checkLogLevel('detail')) {
+					logger.info(`Skipped non-sense UDP packet or invalid TYPE: ${object?.TYPE}`);
 				}
+				return;
 			}
-		}
 
-		logger.info(`Finished downloading ${downloadCounter} items!`);
-		console.log(`Finished downloading ${downloadCounter} items!`);
+			// validate the packet
+			// this didnt work for some reason as of 8-6-25 so i just cut it out and we'll go without validating
+			// this.validateSenseDataObject(object);
+
+    		// if detail log level, log that we just got a status packet
+			if (configManager.checkLogLevel('detail')) {
+    			logger.info(`New packet of TYPE=1 from sense ID: ${object.ID} with data ${object.DATA}`);
+    		}
+
+    		// console.log(`New packet from sense ID: ${object.ID} with data ${object.DATA}`);
+
+            // process the data array from the sense's ports (string to array)
+            const processedDataArrray = object.DATA.split(',').map(Number);
+
+            // console.log('ok great processed data array is now');
+            // console.log(processedDataArrray);
+
+            // iterate over each port and if its a 1 play the scene
+            for (var i = 0; i < object.DATA.length; i++) {
+            	if (object.DATA[i] == true) {
+            		console.log('PLAY A SCENE');
+            	}
+            }
+
+
+
+
+
+		} catch (error) {
+    		// else log error
+            logger.error(`Error processing sense data message: ${error}`);
+        }
 	}
+
+
 
 
 	getUptimeString() {
