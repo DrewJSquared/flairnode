@@ -254,6 +254,20 @@ System initializing...
 					hideAllRenderedVideoFiles();
 					break;
 
+				case 'assert_video_is_playing':
+					hideIdentifyScreen();
+					hideSerialNumberScreen();
+					hideWallTypesLayout();
+					assertVideoIsPlaying(data);
+					break;
+
+				case 'clear_videos_except_dom_ids':
+					hideIdentifyScreen();
+					hideSerialNumberScreen();
+					hideWallTypesLayout();
+					clearVideosExceptDomIds(data);
+					break;
+
 
 				default:
 					console.warn(`Unknown command: ${command}`);
@@ -536,6 +550,7 @@ System initializing...
 				return;
 			}
 
+			element.id = data.dom_id;
 			element.style.position = 'absolute';
 			element.style.left = data.x + 'px';
 			element.style.top = data.y + 'px';
@@ -545,6 +560,58 @@ System initializing...
 
 			layout.appendChild(element);
 		}
+
+		function assertVideoIsPlaying(data) {
+			const existing = document.getElementById(data.dom_id);
+
+			if (existing) {
+				// Handle VIDEO check
+				if (existing.tagName === 'VIDEO') {
+					const isValid =
+						existing.readyState >= 2 &&
+						!existing.paused &&
+						!existing.ended;
+
+					if (isValid) {
+						return; // No action needed
+					}
+				}
+
+				// Handle IMAGE check
+				else if (existing.tagName === 'IMG') {
+					const isValid =
+						existing.complete &&
+						existing.naturalWidth > 0 &&
+						existing.naturalHeight > 0;
+
+					if (isValid) {
+						return; // No action needed
+					}
+				}
+
+				// Element is invalid, remove it and fall through to render a new one
+				existing.remove();
+			}
+
+			// if no valid element found, re-render this element
+			if (!existing) { renderVideoFile(data); }
+		}
+
+		function clearVideosExceptDomIds(data) {
+			try {
+				const domIdsToKeep = Array.isArray(data?.dom_ids) ? data.dom_ids.map(String) : [];
+
+				const all = document.querySelectorAll('video, img');
+				all.forEach((el) => {
+					if (!domIdsToKeep.includes(el.id)) {
+						el.remove();
+					}
+				});
+			} catch (err) {
+				console.error('clearVideosExceptDomIds failed:', err);
+			}
+		}
+
 
 
 

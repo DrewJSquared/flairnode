@@ -133,12 +133,50 @@ class PlaybackController {
 
 				if (sceneId !== null) {
 					const scene = scenes.find(s => s.id === sceneId);
-					console.log('hey so did we render it?' + this.didWeRenderThisScene)
+					// console.log('hey so did we render it?' + this.didWeRenderThisScene)
 
 					if (scene) {
 
-						console.log(`scene.render_version: ${scene.render_version}  |  this.lastRenderVersion: ${this.lastRenderVersion}`);
+						// console.log(`scene.render_version: ${scene.render_version}  |  this.lastRenderVersion: ${this.lastRenderVersion}`);
 
+
+
+						try {
+							if (!scene || !scene.elements || !Array.isArray(scene.elements)) return;
+
+							// clear everything except this scene
+							const domIds = scene.elements.map((element) => {
+								return `${scene.id}-${element.layer}-${scene.render_version}`;
+							});
+
+							RenderSocketClient.send('clear_videos_except_dom_ids', {
+								dom_ids: domIds,
+							});
+
+							// assert playback of this scene
+							scene.elements.forEach((element) => {
+								const contentItem = content.find(c => c.id === element.content_id);
+								if (!contentItem) { return };
+
+								const extension = (contentItem.type == 'image') ? 'jpg' : 'mp4';
+								
+								RenderSocketClient.send('assert_video_is_playing', {
+									file: `/content/${scene.id}-${element.layer}-${scene.render_version}.${extension}`,
+									dom_id: `${scene.id}-${element.layer}-${scene.render_version}`,
+									x: element.x,
+									y: element.y,
+									width: element.width,
+									height: element.height,
+									type: contentItem.type,
+								});
+							});
+						} catch (err) {
+							logger.error('Failed to assert scene playback:', err);
+						}
+
+
+
+/*
 						if (scene.render_version != this.lastRenderVersion) {
 							// this.downloadSceneElements(scenes, content);
 							this.lastRenderVersion = scene.render_version;
@@ -188,6 +226,7 @@ class PlaybackController {
 
 							// }, 10000);
 						}
+	*/
 					}
 
 
