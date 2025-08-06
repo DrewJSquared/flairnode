@@ -4,9 +4,9 @@ Flair Node device firmware, version 1.0
 
 ---
 
-# How To Set Up A New Flair Node - RASPBERRY PI 4 VERSION
+# How To Set Up A New Flair Node
 
-## 1. User Setup (setup during SD card flash from raspi imager)
+## 1. User Setup
 
 ### Root & Users
 
@@ -28,6 +28,9 @@ set to `flairnode`
 ### Hosts:
 `sudo nano /etc/hosts`
 set to `flairnode` where relvant
+
+### Reboot
+Flip switch to MMC for reboot to work properly then reboot. 
 
 - Switch to ssh from this point forward for ease
 
