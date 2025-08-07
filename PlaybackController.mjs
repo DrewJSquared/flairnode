@@ -54,6 +54,7 @@ class PlaybackController {
 		this.startTime = Date.now();
 
 		this.renderClientIsReady = false;
+		this.contentIsReady = false;
 
 		// bind in the constructor
 		this.handleNewSenseData = this.handleNewSenseData.bind(this);
@@ -87,6 +88,12 @@ class PlaybackController {
 				this.renderClientIsReady = true;
 				// logger.info('Render client is now ready to receive commands.');
 			}, 1000);
+		});
+
+		// handle contnet ready
+		eventHub.on('contentReady', () => {
+			this.contentIsReady = true;
+			logger.info('Content downloads are ready.');
 		});
 
 
@@ -294,6 +301,12 @@ class PlaybackController {
 			logger.warn(`Render client not ready, skipping command: ${command}`);
 			return;
 		}
+
+		if (!this.contentIsReady) {
+			logger.warn(`Content not ready, skipping command: ${command}`);
+			return;
+		}
+		
 		RenderSocketClient.send(command, data);
 	}
 

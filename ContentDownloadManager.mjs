@@ -149,6 +149,10 @@ class ContentDownloadManager {
 				} else {
 					this.purgeOldFiles();
 				}
+
+				if (this.queue.length === 0 && !this.isDownloading) {
+					eventHub.emit('allContentReady');
+				}
 			})
 			.catch((err) => {
 				logger.error(`Download failed for ${nextItem.filename}: ${err.message}`);
