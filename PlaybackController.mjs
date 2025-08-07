@@ -291,7 +291,7 @@ class PlaybackController {
 
 	safeSend(command, data) {
 		if (!this.renderClientIsReady) {
-			// logger.warn(`Render client not ready, skipping command: ${command}`);
+			logger.warn(`Render client not ready, skipping command: ${command}`);
 			return;
 		}
 		RenderSocketClient.send(command, data);
