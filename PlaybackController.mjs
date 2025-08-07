@@ -55,6 +55,7 @@ class PlaybackController {
 
 		this.renderClientIsReady = false;
 		this.contentIsReady = false;
+		this.currentRoleId = null;
 
 		// bind in the constructor
 		this.handleNewSenseData = this.handleNewSenseData.bind(this);
@@ -105,13 +106,7 @@ class PlaybackController {
 
 	// core playback handler
 	processPlayback() {
-		// mark as running
-		this.isRunning = true;
-		this.lastRunTime = Date.now();
-
 		try {
-
-
 			// check for identify mode
 			const identifyMode = configManager.getIdentifyMode();
 			const identifyTarget = configManager.getIdentifyTarget();
@@ -139,6 +134,16 @@ class PlaybackController {
 
 					return;
 				}
+
+				// check role
+				const newRoleId = configManager.getRole()?.id ?? null;
+
+				if (newRoleId !== this.currentRoleId) {
+					logger.warn(`Role changed: ${this.currentRoleId} → ${newRoleId}`);
+					this.currentRoleId = newRoleId;
+					this.contentIsReady = false; // force wait for new content
+				}
+
 
 				// load scene data
 				const schedule = configManager.getSchedule();
@@ -306,7 +311,7 @@ class PlaybackController {
 			logger.warn(`Content not ready, skipping command: ${command}`);
 			return;
 		}
-		
+
 		RenderSocketClient.send(command, data);
 	}
 
