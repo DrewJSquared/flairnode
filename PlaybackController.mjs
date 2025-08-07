@@ -54,7 +54,7 @@ class PlaybackController {
 		this.startTime = Date.now();
 
 		this.renderClientIsReady = false;
-		this.contentIsReady = false;
+		// this.contentIsReady = false;
 		this.currentRoleId = null;
 
 		// bind in the constructor
@@ -92,10 +92,10 @@ class PlaybackController {
 		});
 
 		// handle contnet ready
-		eventHub.on('allContentReady', () => {
-			this.contentIsReady = true;
-			logger.info('Content downloads are ready.');
-		});
+		// eventHub.on('allContentReady', () => {
+		// 	this.contentIsReady = true;
+		// 	logger.info('Content downloads are ready.');
+		// });
 
 
 
@@ -145,7 +145,7 @@ class PlaybackController {
 				if (newRoleId !== this.currentRoleId) {
 					logger.info(`Role changed: ${this.currentRoleId} -> ${newRoleId}`);
 					this.currentRoleId = newRoleId;
-					this.contentIsReady = false; // force wait for new content
+					// this.contentIsReady = false; // force wait for new content
 				}
 
 
