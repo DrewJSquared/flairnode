@@ -139,7 +139,7 @@ class PlaybackController {
 				const newRoleId = configManager.getRole()?.id ?? null;
 
 				if (newRoleId !== this.currentRoleId) {
-					logger.warn(`Role changed: ${this.currentRoleId} → ${newRoleId}`);
+					logger.info(`Role changed: ${this.currentRoleId} -> ${newRoleId}`);
 					this.currentRoleId = newRoleId;
 					this.contentIsReady = false; // force wait for new content
 				}
@@ -307,10 +307,10 @@ class PlaybackController {
 			return;
 		}
 
-		if (!this.contentIsReady) {
-			logger.warn(`Content not ready, skipping command: ${command}`);
-			return;
-		}
+		// if (!this.contentIsReady) {
+		// 	logger.warn(`Content not ready, skipping command: ${command}`);
+		// 	return;
+		// }
 
 		RenderSocketClient.send(command, data);
 	}
