@@ -175,12 +175,21 @@ class PlaybackController {
 				return;
 			}
 
-			// if (clearElse) {
-			// 	const domIds = scene.elements.map(e => `${scene.id}-${e.layer}-${scene.render_version}`);
-			// 	RenderSocketClient.send('clear_videos_except_dom_ids', {
-			// 		dom_ids: domIds,
-			// 	});
-			// }
+			if (clearElse) {
+				const currentDomIds = scene.elements.map(e => `${scene.id}-${e.layer}-${scene.render_version}`);
+
+				// include overrides (z_index < 17) — we'll assume those are the active ones
+				const overrideSceneIds = configManager.getScenes()
+					.filter(s => s.id !== sceneId) // don't re-include the current scene
+					.flatMap(s => s.elements.map(e => `${s.id}-${e.layer}-${s.render_version}`));
+
+				const combinedDomIds = [...currentDomIds, ...overrideSceneIds];
+
+				RenderSocketClient.send('clear_videos_except_dom_ids', {
+					dom_ids: combinedDomIds,
+				});
+			}
+
 
 			scene.elements.forEach((element) => {
 				const contentItem = content.find(c => c.id === element.content_id);
