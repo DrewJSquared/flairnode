@@ -106,6 +106,10 @@ class PlaybackController {
 
 	// core playback handler
 	processPlayback() {
+		// mark as running
+		this.isRunning = true;
+		this.lastRunTime = Date.now();
+
 		try {
 			// check for identify mode
 			const identifyMode = configManager.getIdentifyMode();
