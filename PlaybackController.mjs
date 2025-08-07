@@ -92,7 +92,7 @@ class PlaybackController {
 		});
 
 		// handle contnet ready
-		eventHub.on('contentReady', () => {
+		eventHub.on('allContentReady', () => {
 			this.contentIsReady = true;
 			logger.info('Content downloads are ready.');
 		});
