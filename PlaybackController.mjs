@@ -53,8 +53,7 @@ class PlaybackController {
 		this.isRunning = false;
 		this.startTime = Date.now();
 
-		this.didWeRenderThisScene = false;
-		this.lastRenderVersion = 0;
+		this.renderClientIsReady = false;
 
 		// bind in the constructor
 		this.handleNewSenseData = this.handleNewSenseData.bind(this);
@@ -82,6 +81,15 @@ class PlaybackController {
 		// handle incoming sense data
 		eventHub.on('receivedUDP', this.handleNewSenseData);
 
+		// handle render client connected
+		eventHub.on('renderClientConnected', () => {
+			setTimeout(() => {
+				this.renderClientIsReady = true;
+				// logger.info('Render client is now ready to receive commands.');
+			}, 1000);
+		});
+
+
 
 		// log initialization
 		logger.info(`Initializing Playback Controller...`);
@@ -102,11 +110,11 @@ class PlaybackController {
 			const identifyTarget = configManager.getIdentifyTarget();
 			if (identifyMode == true) {
 				if (identifyTarget == true) {
-					RenderSocketClient.send('identify_this_node', { 
+					this.safeSend('identify_this_node', { 
 	    				serial_number: idManager.getSerialNumber(), 
 	    			});
 				} else {
-					RenderSocketClient.send('identify_not_this_node', { 
+					this.safeSend('identify_not_this_node', { 
 	    				serial_number: idManager.getSerialNumber(), 
 	    			});
 				}
@@ -118,7 +126,7 @@ class PlaybackController {
 					logger.warn(`No wall type found, unable to show wall type zones.`);
 
 					// Fallback: show serial number if nothing else is active
-					RenderSocketClient.send('show_serial_number', { 
+					this.safeSend('show_serial_number', { 
 	    				serial_number: idManager.getSerialNumber(), 
 	    			});
 
@@ -150,7 +158,7 @@ class PlaybackController {
 						uptime: uptime,
 					}));
 
-					RenderSocketClient.send('show_wall_type_zones_layout_with_time', { zones: enhancedZones });
+					this.safeSend('show_wall_type_zones_layout_with_time', { zones: enhancedZones });
 				}
 			}
 		} catch (error) {
@@ -185,7 +193,7 @@ class PlaybackController {
 
 				const combinedDomIds = [...currentDomIds, ...overrideSceneIds];
 
-				RenderSocketClient.send('clear_videos_except_dom_ids', {
+				this.safeSend('clear_videos_except_dom_ids', {
 					dom_ids: combinedDomIds,
 				});
 			}
@@ -197,7 +205,7 @@ class PlaybackController {
 
 				const extension = (contentItem.type === 'image') ? 'jpg' : 'mp4';
 
-				RenderSocketClient.send('assert_video_is_playing', {
+				this.safeSend('assert_video_is_playing', {
 					file: `/content/${scene.id}-${element.layer}-${scene.render_version}.${extension}`,
 					dom_id: `${scene.id}-${element.layer}-${scene.render_version}`,
 					x: element.x,
@@ -280,6 +288,15 @@ class PlaybackController {
 		const s = seconds % 60;
 		return `${h}h ${m}m ${s}s`;
 	}
+
+	safeSend(command, data) {
+		if (!this.renderClientIsReady) {
+			// logger.warn(`Render client not ready, skipping command: ${command}`);
+			return;
+		}
+		RenderSocketClient.send(command, data);
+	}
+
 }
 
 
