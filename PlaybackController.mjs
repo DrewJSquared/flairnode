@@ -55,6 +55,10 @@ class PlaybackController {
 
 		this.didWeRenderThisScene = false;
 		this.lastRenderVersion = 0;
+
+		// bind in the constructor
+		this.handleNewSenseData = this.handleNewSenseData.bind(this);
+		this.playSceneById = this.playSceneById.bind(this);
 	}
 
 
@@ -121,131 +125,21 @@ class PlaybackController {
 					return;
 				}
 
-				const scenes = configManager.getScenes();
-				const notes = configManager.getNotes();
-				const content = configManager.getContent();
-				const sceneMatch = notes?.match(/^playscene=(\d+)$/);
-				const sceneId = sceneMatch ? parseInt(sceneMatch[1], 10) : null;
+				// load scene data
+				const schedule = configManager.getSchedule();
+				const now = new Date();
+				const currentMinutes = now.getHours() * 60 + now.getMinutes();
+				const activeSchedule = schedule?.find(entry => currentMinutes >= entry.start && currentMinutes <= entry.end);
+				const sceneId = activeSchedule?.scene_id ?? null;
 
-				const filesToRender = [];
-
-				// if (!this.didWeRenderThisScene) {
-				// 	this.downloadSceneElements(scenes, content);
-				// }
-
-				// let didWeRenderThisScene = false;
-
+				// if scene exists then play it
 				if (sceneId !== null) {
-					const scene = scenes.find(s => s.id === sceneId);
-					// console.log('hey so did we render it?' + this.didWeRenderThisScene)
-
-					if (scene) {
-
-						// console.log(`scene.render_version: ${scene.render_version}  |  this.lastRenderVersion: ${this.lastRenderVersion}`);
-
-
-
-						try {
-							if (!scene || !scene.elements || !Array.isArray(scene.elements)) return;
-
-							// clear everything except this scene
-							const domIds = scene.elements.map((element) => {
-								return `${scene.id}-${element.layer}-${scene.render_version}`;
-							});
-
-							RenderSocketClient.send('clear_videos_except_dom_ids', {
-								dom_ids: domIds,
-							});
-
-							// assert playback of this scene
-							scene.elements.forEach((element) => {
-								const contentItem = content.find(c => c.id === element.content_id);
-								if (!contentItem) { return };
-
-								const extension = (contentItem.type == 'image') ? 'jpg' : 'mp4';
-								
-								RenderSocketClient.send('assert_video_is_playing', {
-									file: `/content/${scene.id}-${element.layer}-${scene.render_version}.${extension}`,
-									dom_id: `${scene.id}-${element.layer}-${scene.render_version}`,
-									x: element.x,
-									y: element.y,
-									width: element.width,
-									height: element.height,
-									type: contentItem.type,
-								});
-							});
-						} catch (err) {
-							logger.error('Failed to assert scene playback:', err);
-						}
-
-
-
-/*
-						if (scene.render_version != this.lastRenderVersion) {
-							// this.downloadSceneElements(scenes, content);
-							this.lastRenderVersion = scene.render_version;
-
-							// setTimeout(function () {
-								console.log('NOW telling chrome to show videos');
-
-								// console.log(scene);
-								// console.log(content);
-
-								// clear screen essentially
-								RenderSocketClient.send('hide_rendered_video_files', {});
-
-								if (scene.elements?.length > 0) {
-									for (const element of scene.elements) {
-
-										// console.log('element');
-										// console.log(element);
-
-										const contentItem = content.find(c => c.id === element.content_id);
-
-										// console.log('contentItem');
-										// console.log(contentItem);
-
-										if (!contentItem) continue;
-
-										const extension = (contentItem.type == 'image') ? 'jpg' : 'mp4';
-
-										const fileToRenderObject = {
-											file: `/content/${scene.id}-${element.layer}-${scene.render_version}.${extension}`,
-											x: element.x,
-											y: element.y,
-											width: element.width,
-											height: element.height,
-											type: contentItem.type,
-										};
-
-										RenderSocketClient.send('render_video_file', fileToRenderObject);
-
-										// console.log('sending render object');
-										// console.log(fileToRenderObject);
-									}
-
-									this.didWeRenderThisScene = true;
-									// console.log('scene is rendered yay')
-								}
-
-							// }, 10000);
-						}
-	*/
-					}
-
-
-
+					this.playSceneById(sceneId, true, true);
 				} else {
 					// if no scene assigned show zones
 
-
-
 					// get zones array from wallType.canvas.zones or fallback
 					const zones = wallType.canvas?.zones ?? [];
-
-					// send layout to frontend
-					// DEFAULT VERSION NO TIME DATA
-					// RenderSocketClient.send('show_wall_type_zones_layout', { zones });
 
 					const currentTime = new Date().toLocaleTimeString();
 					const uptime = this.getUptimeString();
@@ -258,36 +152,7 @@ class PlaybackController {
 
 					RenderSocketClient.send('show_wall_type_zones_layout_with_time', { zones: enhancedZones });
 				}
- 
-
-
-				// TODO: Handle Scene playback logic when role is assigned
 			}
-
-			
-
-
-
-			// // check for identify mode/target
-			// const identifyMode = configManager.getIdentifyMode();
-			// const identifyTarget = configManager.getIdentifyTarget();
-
-			// if (identifyMode == true) {
-			// 	if (identifyTarget == true) {
-			// 		RenderSocketClient.send('identify_this_node', { 
-	    	// 			serial_number: idManager.getSerialNumber(), 
-	    	// 		});
-			// 	} else {
-			// 		RenderSocketClient.send('identify_not_this_node', { 
-	    	// 			serial_number: idManager.getSerialNumber(), 
-	    	// 		});
-			// 	}
-			// } else {
-			// 	RenderSocketClient.send('disable_identify_mode', { 
-    		// 	});
-			// }
-
-
 		} catch (error) {
 			logger.error(`Error in processPlayback: ${error.message}`);
 		} finally {
@@ -295,6 +160,52 @@ class PlaybackController {
 			this.isRunning = false;
 		}
 	}
+
+
+
+	// play scene by id - play a scene
+	playSceneById(sceneId, repeat = true, clearElse = false, z_index = 17) {
+		try {
+			const scenes = configManager.getScenes();
+			const content = configManager.getContent();
+			const scene = scenes.find(s => s.id === sceneId);
+
+			if (!scene || !Array.isArray(scene.elements)) {
+				logger.warn(`Scene ${sceneId} is missing or malformed.`);
+				return;
+			}
+
+			// if (clearElse) {
+			// 	const domIds = scene.elements.map(e => `${scene.id}-${e.layer}-${scene.render_version}`);
+			// 	RenderSocketClient.send('clear_videos_except_dom_ids', {
+			// 		dom_ids: domIds,
+			// 	});
+			// }
+
+			scene.elements.forEach((element) => {
+				const contentItem = content.find(c => c.id === element.content_id);
+				if (!contentItem) return;
+
+				const extension = (contentItem.type === 'image') ? 'jpg' : 'mp4';
+
+				RenderSocketClient.send('assert_video_is_playing', {
+					file: `/content/${scene.id}-${element.layer}-${scene.render_version}.${extension}`,
+					dom_id: `${scene.id}-${element.layer}-${scene.render_version}`,
+					x: element.x,
+					y: element.y,
+					width: element.width,
+					height: element.height,
+					type: contentItem.type,
+					loop: repeat,
+					z_index: z_index,
+				});
+			});
+		} catch (err) {
+			logger.error(`Failed to play scene ${sceneId}: ${err.message}`);
+		}
+
+	}
+
 
 
 
@@ -324,19 +235,25 @@ class PlaybackController {
             // process the data array from the sense's ports (string to array)
             const processedDataArrray = object.DATA.split(',').map(Number);
 
-            // console.log('ok great processed data array is now');
-            // console.log(processedDataArrray);
+            const triggers = configManager.getTriggers();
 
-            // iterate over each port and if its a 1 play the scene
-            for (var i = 0; i < object.DATA.length; i++) {
-            	if (object.DATA[i] == true) {
-            		console.log('PLAY A SCENE');
-            	}
-            }
+			for (let i = 0; i < processedDataArrray.length; i++) {
+				if (processedDataArrray[i] === 1) {
+					const trigger = triggers?.find(t => t.port === i + 1);
+					if (trigger?.scene_id != null) {
+						const port = i + 1;
+						const z = (port === 1) ? 0 : 17 - port; // port 1 = z0, port 2 = z15, ..., port 16 = z1
 
+						this.playSceneById(trigger.scene_id, false, false, z);
 
+						if (configManager.checkLogLevel('detail')) {
+							logger.info(`Trigger on port ${i + 1} -> playing scene ${trigger.scene_id}`);
+						}
+					}
+				}
+			}
 
-
+			// finished processing triggers
 
 		} catch (error) {
     		// else log error

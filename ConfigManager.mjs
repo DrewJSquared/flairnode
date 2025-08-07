@@ -216,6 +216,21 @@ class ConfigManager {
         return this.config.notes ?? [];
 	}
 
+	// role
+	getRole() {
+        return this.config.role ?? {};
+	}
+
+	// schedule
+	getSchedule() {
+        return this.config.schedule ?? [];
+	}
+
+	// triggers
+	getTriggers() {
+        return this.config.triggers ?? [];
+	}
+
 
 	// timezone
 	// getDeviceTimezone() {

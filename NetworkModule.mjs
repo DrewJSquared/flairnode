@@ -24,7 +24,7 @@ import idManager from './IdManager.mjs';
 // variables
 const API_URL = 'https://flairled.com/api/v1/flair-node/sync';  // URL to hit with a POST request
 
-const USE_LOCALHOST = false;  // set to true to use the attitudelighting.test API_URL instead (FOR DEVELOPMENT ONLY)
+const USE_LOCALHOST = true;  // set to true to use the flairnode.test API_URL instead (FOR DEVELOPMENT ONLY)
 const LAPTOP_MODE = (process.platform == 'darwin');  // checks whether we're running on macos (laptop mode) or not
 
 const PING_INTERVAL = 1000;  // interval in ms to ping the server (should be 1000ms)
@@ -49,8 +49,8 @@ class NetworkModule {
         // init URL endpoint to API_URL
         this.url = API_URL;
 
-        // check if we're on laptop mode and USE_LOCALHOST is true, if so then use the attitudelighting.test API url.
-        // this is added to make absolutely sure that we only use the attitudelighting.test API URL if we're running on
+        // check if we're on laptop mode and USE_LOCALHOST is true, if so then use the flairnode.test API url.
+        // this is added to make absolutely sure that we only use the flairnode.test API URL if we're running on
         // macOS laptop for development, and to ensure that production devices can NEVER use this url
         if (USE_LOCALHOST && LAPTOP_MODE) {
         	this.url = 'http://flairled.test/api/v1/flair-node/sync';

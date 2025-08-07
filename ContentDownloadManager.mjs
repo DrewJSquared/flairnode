@@ -21,7 +21,7 @@ import configManager from './ConfigManager.mjs';
 
 
 // variables
-const USE_LOCALHOST = false;  // for development only
+const USE_LOCALHOST = true;  // for development only
 const LAPTOP_MODE = (process.platform === 'darwin');
 
 const CONTENT_DOWNLOAD_URL = (USE_LOCALHOST && LAPTOP_MODE)

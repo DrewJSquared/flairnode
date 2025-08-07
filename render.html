@@ -539,9 +539,18 @@ System initializing...
 				element = document.createElement('video');
 				element.src = fullPath;
 				element.autoplay = true;
-				element.loop = true;
 				element.muted = true;
 				element.playsInline = true;
+
+				const shouldLoop = data.loop !== false;
+				element.loop = shouldLoop;
+
+				if (!shouldLoop) {
+					element.addEventListener('ended', () => {
+						element.remove();
+					});
+				}
+
 			} else if (data.type === 'image') {
 				element = document.createElement('img');
 				element.src = fullPath;
@@ -557,6 +566,8 @@ System initializing...
 			element.style.width = data.width + 'px';
 			element.style.height = data.height + 'px';
 			element.style.objectFit = 'cover';
+			const logicalZ = (typeof data.z_index === 'number') ? data.z_index : 17;
+			element.style.zIndex = 100 - logicalZ;
 
 			layout.appendChild(element);
 		}
