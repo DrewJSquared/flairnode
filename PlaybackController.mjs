@@ -306,10 +306,10 @@ class PlaybackController {
 	}
 
 	safeSend(command, data) {
-		if (!this.renderClientIsReady) {
-			logger.warn(`Render client not ready, skipping command: ${command}`);
-			return;
-		}
+		// if (!this.renderClientIsReady) {
+		// 	logger.warn(`Render client not ready, skipping command: ${command}`);
+		// 	return;
+		// }
 
 		// if (!this.contentIsReady) {
 		// 	logger.warn(`Content not ready, skipping command: ${command}`);
