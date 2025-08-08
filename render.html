@@ -132,6 +132,10 @@ System initializing...
 					console.warn('WebSocket disconnected');
 					isConnected = false;
 					showErrorScreen();
+					hideAllRenderedVideoFiles();
+					hideIdentifyScreen();
+					hideSerialNumberScreen();
+					hideWallTypesLayout();
 
 					// attempt reconnect after delay
 					setTimeout(() => {
@@ -157,11 +161,19 @@ System initializing...
 		window.addEventListener('error', (e) => {
 			console.error('Unhandled error:', e.error || e.message);
 			showErrorScreen();
+			hideAllRenderedVideoFiles();
+			hideIdentifyScreen();
+			hideSerialNumberScreen();
+			hideWallTypesLayout();
 		});
 
 		window.addEventListener('unhandledrejection', (e) => {
 			console.error('Unhandled promise rejection:', e.reason);
 			showErrorScreen();
+			hideAllRenderedVideoFiles();
+			hideIdentifyScreen();
+			hideSerialNumberScreen();
+			hideWallTypesLayout();
 		});
 
 
@@ -185,6 +197,10 @@ System initializing...
 			} catch (err) {
 				console.error('Failed to process WebSocket message:', err);
 				showErrorScreen();
+				hideAllRenderedVideoFiles();
+				hideIdentifyScreen();
+				hideSerialNumberScreen();
+				hideWallTypesLayout();
 			}
 		}
 
