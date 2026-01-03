@@ -1,7 +1,16 @@
-# ssh in
+# INSTALLATION INSTRUCTIONS - SOAYAN MICRO PC VERSION
+
+## 1. Initial Setup
+
+These steps assume you've already done the inital setup steps in the assembly guide and you've reached the step that says to go to github and install the code by copying and pasting different code snippets into the terminal. Follow this guide to do so. 
 
 
-## 7. FlairNode Source Code
+
+
+
+
+
+## 2. FlairNode Source Code
 
 ### Download & Unzip
 
@@ -48,7 +57,7 @@ Copy/Paste the following for id.json
 
 
 
-## 8. NVM, Node, & PM2 Setup
+## 3. NVM, Node, & PM2 Setup
 
 ### Install NVM
 `cd ~/ && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash `
@@ -63,5 +72,12 @@ Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
 
 (and copy/paste startup script to save startup. type in sudo pw when prompted and hit enter)
 
+
+
+
+
+
+
+## 4. You're done! Go back to the assembly guide and keep going. 
 
 

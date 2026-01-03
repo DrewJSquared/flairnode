@@ -4,238 +4,37 @@ Flair Node device firmware, version 1.0
 
 ---
 
-# How To Set Up A New Flair Node - RASPBERRY PI 4 VERSION
+# HOW TO SET UP A FLAIR NODE - SOAYAN MICRO PC VERSION
 
-## 1. User Setup (setup during SD card flash from raspi imager)
+## 1. Initial Setup
 
-### Root & Users
+These steps assume you've already done the inital setup steps in the assembly guide and you've reached the step that says to go to github and install the code by copying and pasting different code snippets into the terminal. Follow this guide to do so. 
 
-Root PW: `_`
 
-User: `flair`
-PW: `_`
 
-real name: Flair
 
-detected location
 
-don't generate locales (6)
 
-### Hostname:
-`sudo armbian-config`
 
-Then go to **localization** > **hostname** then rename to `flairnode`
-
-- Switch to ssh from this point forward for ease
-
-## 2. GETTY TTY1 SERVICE
-
-### Create Service Directory & Files
-
-`sudo mkdir -p /etc/systemd/system/getty@tty1.service.d`
-
-`sudo nano /etc/systemd/system/getty@tty1.service.d/override.conf`
-
-### Service File
-```
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty --autologin flair --noclear %I $TERM
-```
-
-### Start It
-`sudo systemctl daemon-reexec && sudo systemctl daemon-reload`
-
-`sudo reboot`
-
-
-## 3. Install GUI Layer
-
-### Installs
-
-`sudo apt update`
-
-```
-sudo apt install -y --no-install-recommends \
-  xserver-xorg \
-  x11-xserver-utils \
-  xinit \
-  openbox \
-  unclutter \
-  xdotool \
-  unzip \
-  python3-xdg
-```
-
-### Install Chrome Directly
-`sudo apt install -y chromium-browser`
-
-this is the version direct from raspi which should fix the casting issue
-
-
-## 4. BASH PROFILE
-Setup bash profile script
-
-`cd /home/flair/ && sudo nano .bash_profile`
-
-Contents
-```
-# Source bashrc if it exists
-if [ -f ~/.bashrc ]; then
-  . ~/.bashrc
-fi
-
-# Only run GUI setup on primary TTY without DISPLAY already set
-if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-  # clear console
-  clear
-  # hide cursor
-  tput civis
-
-  # Print system info
-  echo "======================="
-  echo " Welcome to Flair Node"
-  echo "======================="
-  echo "IP: $(hostname -I)"
-  echo "$(date)"
-
-  # Countdown before launching X
-  for i in $(seq 10 -1 1); do
-          printf "\rStarting in $i seconds... "
-          sleep 1
-  done
-  echo ""
-
-  # Launch X and log all output
-  echo "Launching X server via .bash_profile..."
-  startx 2>&1 | tee ~/startx_bash_profile.log
-fi
-```
-
-## 5. Xserver Config (window management)
-Open config file:
-
-`nano ~/.xinitrc`
-
-Contents:
-```
-#!/bin/bash
-
-# Start the window manager first
-openbox-session &
-
-# Wait briefly to ensure X and Openbox are ready
-sleep 1
-
-# Disable screen blanking and power saving
-xset s off           # Disable screen saver
-xset s noblank       # Prevent screen blanking
-xset -dpms           # Disable energy-saving features
-xset dpms 0 0 0      # Just in case, set timers to 0
-
-# Move mouse to top left corner to see it during boot
-xdotool mousemove 10 10
-
-# Hide cursor after 5 seconds of inactivity
-unclutter -idle 5 &
-
-# Wait for everything else then start chromium
-sleep 2
-
-# Launch Chromium in kiosk mode — this stays in foreground
-chromium \
-        --noerrdialogs \
-        --disable-infobars \
-        --disable-session-crashed-bubble \
-        --disable-translate \
-        --disable-features=TranslateUI \
-        --disable-component-update \
-        --disable-background-networking \
-        --disable-sync \
-        --metrics-recording-only \
-        --no-first-run \
-        --autoplay-policy=no-user-gesture-required \
-        --start-fullscreen \
-        --kiosk file:///home/flair/flairnode/render.html \
-        --window-size=1920,1080 \
-        --window-position=0,0 \
-        --window-background-color="#000000" \
-        --force-device-scale-factor=1 \
-        --user-data-dir=/home/flair/.flair-profile
-        --disable-gpu \
-        --disable-software-rasterizer \
-        --disable-gpu-compositing \
-        --disable-accelerated-2d-canvas \
-        --no-service-autorun \
-        --disable-features=MediaRouter
-```
-
-
-## 6. Boot Config
-
-### Boot Setup
-
-Open file
-
-`sudo nano /boot/armbianEnv.txt`
-
-File contents:
-```
-verbosity=1
-bootlogo=false
-disp_mode=1920x1080p60
-console=serial
-overlay_prefix=meson
-rootdev=UUID=f5fb71ca-255e-4afd-b19f-047a7ac3bfa2
-rootfstype=ext4
-extraargs=hdmi_force_hotplug=1
-usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
-```
-
-Then recompile: 
-
-`cd /boot && sudo mkimage -C none -A arm -T script -d boot.cmd boot.scr`
-
-### Disable MOTD:
-
-`sudo chmod -x /etc/update-motd.d/*`
-
-### Passwordless Shutdown
-
-Open sudo file
-
-`sudo visudo`
-
-Add this line to end
-
-`flair ALL=(ALL) NOPASSWD: /usr/sbin/shutdown`
-
-### THE MAGIC THAT FIXES THE BOOT PROBLEM (THANK HEAVENS)
-
-Whatever this is gets rid of GPU card 1
-
-`echo "blacklist simpledrm" | sudo tee /etc/modprobe.d/blacklist-simpledrm.conf`
-
-And then this recompiles something
-
-`sudo update-initramfs -u`
-
-Then you gotta reboot twin.
-
-
-
-## 7. FlairNode Source Code
+## 2. FlairNode Source Code
 
 ### Download & Unzip
+
+Install CURL with
+
+`sudo apt install curl`
+
+When prompted, type in sudo password, `jsquared22!`
+
 Download the GitHub repository as a zip file
 
-`cd /home/flair/ && curl -L -o flairnode.zip "https://github.com/DrewJSquared/flairnode/archive/refs/heads/main.zip"`
+`curl -L -o flairnode.zip "https://github.com/DrewJSquared/flairnode/archive/refs/heads/main.zip"`
 
 Unzip the downloaded file
 
 `unzip flairnode.zip -d flairnode_tmp`
 
-Move the contents to the attitudecontrol2a directory
+Move the contents to the flairnode directory
 
 `rsync -av --remove-source-files flairnode_tmp/flairnode-main/ ./flairnode`
 
@@ -260,18 +59,14 @@ Copy/Paste the following for id.json
 ```
 
 
-### Set Timezone
-`sudo ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime && sudo dpkg-reconfigure -f noninteractive tzdata`
 
 
 
 
-
-
-## 8. NVM, Node, & PM2 Setup
+## 3. NVM, Node, & PM2 Setup
 
 ### Install NVM
-`cd /home/flair/ && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash `
+`cd ~/ && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash `
 
 Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
 
@@ -279,137 +74,16 @@ Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
 `nvm install 18 && npm install pm2 -g`
 
 ### Setup PM2 Processes
-`cd /home/flair/flairnode && pm2 start FlairNode.js && pm2 save && pm2 startup`
+`cd ~/flairnode && pm2 start FlairNode.js && pm2 save && pm2 startup`
 
-(and copy/paste startup script to save startup)
-
-
-
-
-
-
-
-## 9. Reverse Tunnel SSH
-Install autossh & test connection: `sudo apt install autossh && autossh -R flairnode-00100XX:22:localhost:22 serveo.net`
-(Be sure to change the serial number!)
-(and test connection and accept key for Serveo.net else it wont work!!!)
-
-Setup service file: `sudo nano /etc/systemd/system/flairssh.service`
-
-Copy this into the new file: 
-```
-[Unit]
-Description=Flair Node SSH
-After=network.target
-StartLimitIntervalSec=0
-
-[Service]
-Type=simple
-Restart=always
-RestartSec=1
-User=flair
-ExecStart=autossh -R flairnode-00100XX:22:localhost:22 serveo.net
-
-[Install]
-WantedBy=multi-user.target
-```
-(Be sure to change the serial number!)
-
-Start service: `sudo systemctl start flairssh.service && sudo systemctl enable flairssh.service`
+(and copy/paste startup script to save startup. type in sudo pw when prompted and hit enter)
 
 
 
 
 
 
-## 10. USB Auto Mount Service
-Made my own auto usb mount service
 
-### Auto Mount
-
-Setup:
-
-`sudo nano /usr/local/bin/flair-usb-automount`
-
-
-File Contents:
-
-```
-#!/bin/bash
-
-echo "[flair-usb-automount] Watching for /dev/sda1 add/remove events..."
-
-MOUNT_DIR="/media/usb0"
-
-udevadm monitor --udev --subsystem-match=block | while read -r line; do
-  if echo "$line" | grep -q 'add' && echo "$line" | grep -q 'sda1'; then
-    echo "[flair-usb-automount] Detected /dev/sda1 add event!"
-
-    if mount | grep -q '/dev/sda1'; then
-      echo "[flair-usb-automount] /dev/sda1 is already mounted."
-    else
-      echo "[flair-usb-automount] Mounting /dev/sda1 to $MOUNT_DIR"
-      sudo mkdir -p "$MOUNT_DIR"
-      if sudo mount /dev/sda1 "$MOUNT_DIR"; then
-        echo "[flair-usb-automount] Successfully mounted to $MOUNT_DIR"
-      else
-        echo "[flair-usb-automount] Failed to mount /dev/sda1"
-      fi
-    fi
-  fi
-
-  if echo "$line" | grep -q 'remove' && echo "$line" | grep -q 'sda1'; then
-    echo "[flair-usb-automount] Detected /dev/sda1 removal event!"
-
-    if mount | grep -q '/dev/sda1'; then
-      echo "[flair-usb-automount] Unmounting /dev/sda1 from $MOUNT_DIR"
-      if sudo umount /dev/sda1; then
-        echo "[flair-usb-automount] Successfully unmounted."
-        sudo rmdir "$MOUNT_DIR" 2>/dev/null
-      else
-        echo "[flair-usb-automount] Failed to unmount /dev/sda1"
-      fi
-    else
-      echo "[flair-usb-automount] /dev/sda1 was not mounted."
-    fi
-  fi
-done
-```
-
-Make executable:
-
-`sudo chmod +x /usr/local/bin/flair-usb-automount`
-
-
-### Setup systemd service
-
-Command:
-
-`sudo nano /etc/systemd/system/flair-usb-automount.service`
-
-
-File Contents:
-
-```
-[Unit]
-Description=Flair USB Auto-Mount Service
-After=multi-user.target
-
-[Service]
-Type=simple
-ExecStart=/usr/local/bin/flair-usb-automount
-Restart=always
-RestartSec=2
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Enable:
-
-`sudo systemctl daemon-reload && sudo systemctl enable --now flair-usb-automount.service`
-
+## 4. You're done! Go back to the assembly guide and keep going. 
 
 
