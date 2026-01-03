@@ -231,6 +231,11 @@ class ConfigManager {
         return this.config.triggers ?? [];
 	}
 
+	// custom times
+	getCustomTimes() {
+        return this.config.custom_times ?? [];
+	}
+
 
 	// timezone
 	// getDeviceTimezone() {

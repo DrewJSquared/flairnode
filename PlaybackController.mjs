@@ -153,8 +153,44 @@ class PlaybackController {
 				const schedule = configManager.getSchedule();
 				const now = new Date();
 				const currentMinutes = now.getHours() * 60 + now.getMinutes();
-				const activeSchedule = schedule?.find(entry => currentMinutes >= entry.start && currentMinutes <= entry.end);
-				const sceneId = activeSchedule?.scene_id ?? null;
+
+				const activeSchedule = schedule?.find(entry =>
+					currentMinutes >= entry.start && currentMinutes <= entry.end
+				);
+
+				let sceneId = activeSchedule?.scene_id ?? null;
+
+
+				// load custom times data (priority)
+				const customTimes = configManager.getCustomTimes() ?? [];
+				// console.log(customTimes);
+
+				const currentMonth = now.getMonth() + 1; // 1-12
+				const currentDay = now.getDate();        // 1-31
+				const currentMD = (currentMonth * 100) + currentDay;
+
+				const activeCustom = customTimes.find(entry => {
+					const startMD = (Number(entry.start_month) * 100) + Number(entry.start_day);
+					const endMD = (Number(entry.end_month) * 100) + Number(entry.end_day);
+
+					// Not supporting year wrap (e.g., Nov -> Feb). If it wraps, ignore for now.
+					if (startMD > endMD) {
+						return false;
+					}
+
+					const dateInRange = currentMD >= startMD && currentMD <= endMD;
+					const timeInRange = currentMinutes >= entry.start && currentMinutes <= entry.end;
+
+					return dateInRange && timeInRange;
+				});
+
+				if (activeCustom?.scene_id != null) {
+					sceneId = activeCustom.scene_id;
+				}
+
+				// debug selected scene id
+				// console.log('current scene id is ' + sceneId);
+
 
 				// if scene exists then play it
 				if (sceneId !== null) {

@@ -24,7 +24,7 @@ import idManager from './IdManager.mjs';
 // variables
 const API_URL = 'https://flairled.com/api/v1/flair-node/sync';  // URL to hit with a POST request
 
-const USE_LOCALHOST = true;  // set to true to use the flairnode.test API_URL instead (FOR DEVELOPMENT ONLY)
+const USE_LOCALHOST = false;  // set to true to use the flairnode.test API_URL instead (FOR DEVELOPMENT ONLY)
 const LAPTOP_MODE = (process.platform == 'darwin');  // checks whether we're running on macos (laptop mode) or not
 
 const PING_INTERVAL = 1000;  // interval in ms to ping the server (should be 1000ms)
@@ -248,7 +248,7 @@ class NetworkModule {
 
 			// log a success message
 			if (configManager.checkLogLevel('minimal')) {
-	    		logger.info(`${response.status} ${response.statusText} request successful! Connected to attitude.lighting server!`);
+	    		logger.info(`${response.status} ${response.statusText} request successful! Connected to FlairLED.com server!`);
 	    	}
 
     		// if there had previously been errors, then flag that we need to grab the missed messages out of local file storage
