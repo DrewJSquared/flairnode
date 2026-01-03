@@ -87,7 +87,15 @@ Once this command runs, the end of the output will include 3 lines that you need
 
 
 
+## 4. Chrome Kiosk Auto Launch
 
-## 4. You're done! Go back to the assembly guide and keep going. 
+### Set Permissions
+`cd ~/flairnode && chmod +x flairnode-kiosk.sh`
+
+
+
+
+
+## 5. You're done! Go back to the assembly guide and keep going. 
 
 
