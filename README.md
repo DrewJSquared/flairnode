@@ -58,6 +58,10 @@ Copy/Paste the following for id.json
 }
 ```
 
+Change the device id number and serial number to match what's listed on the flairnode website for this device.
+
+Then hit control x to save, select yes, then hit enter to close. 
+
 
 
 
@@ -68,7 +72,7 @@ Copy/Paste the following for id.json
 ### Install NVM
 `cd ~/ && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash `
 
-Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
+Once this script finishes, close and reopen the terminal window in order for it to take effect. 
 
 ### Install NodeJS, NPM, & PM2
 `nvm install 18 && npm install pm2 -g`
@@ -76,7 +80,7 @@ Once this script finishes, *COPY THE THINGY SO IT TAKES EFFECT*!
 ### Setup PM2 Processes
 `cd ~/flairnode && pm2 start FlairNode.js && pm2 save && pm2 startup`
 
-(and copy/paste startup script to save startup. type in sudo pw when prompted and hit enter)
+Once this command runs, the end of the output will include 3 lines that you need to copy and paste into the terminal in order for them to run. 
 
 
 
