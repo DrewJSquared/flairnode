@@ -60,13 +60,8 @@ setTimeout(() => {
 
 // initialize playback controller
 setTimeout(() => {
-	logger.warn('DELAYING LAUNCHING PLAYBACK CONTROLLER BY 90 SECONDS!');
-}, 50);
-
-setTimeout(() => {
-	logger.warn('LAUNCHING PLAYBACK CONTROLLER MODULE...');
 	playbackController.init();
-}, 90000);
+}, 50);
 
 
 // initialize macros module
