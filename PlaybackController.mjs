@@ -310,6 +310,15 @@ class PlaybackController {
 				if (processedDataArrray[i] === 1) {
 					const trigger = triggers?.find(t => t.port === i + 1);
 					if (trigger?.scene_id != null) {
+						// if sense_id is configured, only respond to the matching sense device;
+						// if sense_id is null/absent, respond to all (backwards-compatible default)
+						if (trigger.sense_id != null && object.ID !== trigger.sense_id) {
+							if (configManager.checkLogLevel('detail')) {
+								logger.info(`Trigger on port ${i + 1} skipped — sense ID ${object.ID} does not match configured ${trigger.sense_id}`);
+							}
+							continue;
+						}
+
 						const port = i + 1;
 						const z = (port === 1) ? 0 : 17 - port; // port 1 = z0, port 2 = z15, ..., port 16 = z1
 
